@@ -1,0 +1,2615 @@
+module
+
+public import Mathlib
+public import MMP.Attr
+public import MMP.AlgebraicGeometry.MMP.Fourfold.StratumAdjunction
+public import MMP.AlgebraicGeometry.MMP.Fourfold.CrepantPluriform
+public import MMP.RingTheory.Kaehler.PluriformProduct
+import MMP.AlgebraicGeometry.Intersection.CurveCartierLocal
+import MMP.AlgebraicGeometry.MMP.Threefold.SurfaceLocalRings
+import MMP.AlgebraicGeometry.Singularities.Discrepancy.Uniqueness
+import MMP.AlgebraicGeometry.Singularities.DivisorOver
+import StacksFrontier.AlgebraicGeometry.Properties.NormalCodimensionOne
+import MMP.AlgebraicGeometry.MMP.Fourfold.Preadmissible.ConductorDescent
+import MMP.AlgebraicGeometry.Morphisms.Birational.TransformBasics
+import MMP.AlgebraicGeometry.Singularities.Surface.DiscrepancyMultiplicity
+import MMP.AlgebraicGeometry.Singularities.DiscrepancyProperties
+public import MMP.AlgebraicGeometry.MMP.Contraction.Defs
+import MMP.AlgebraicGeometry.MMP.Abundance.Curve.AdmissibleSectionsGenerate
+import MMP.AlgebraicGeometry.MMP.Threefold.Canonical
+import MMP.AlgebraicGeometry.Singularities.Adjunction.ResidueDifferent
+import MMP.AlgebraicGeometry.Singularities.SncLogDiscrepancyFormula
+import MMP.AlgebraicGeometry.Singularities.Surface.MldDenominatorBound
+import MMP.AlgebraicGeometry.Resolution.SNCWeight.FinalModel
+import MMP.AlgebraicGeometry.Singularities.Snc.LocalEquations
+import MMP.AlgebraicGeometry.Singularities.Adjunction.DltStratum
+import MMP.AlgebraicGeometry.Divisor.AlgebraicHartogsUnits
+import MMP.AlgebraicGeometry.Singularities.WeightedMonomialValuation
+import MMP.AlgebraicGeometry.Singularities.CrepantBoundary
+import MMP.AlgebraicGeometry.Resolution.SNCWeight.PrimitiveWeightModification
+import MMP.AlgebraicGeometry.MMP.Abundance.SubkltSurfacePluriformFinite
+import MMP.AlgebraicGeometry.MMP.Fourfold.Preadmissible.CrepantDifferentMatch
+import MMP.AlgebraicGeometry.MMP.Abundance.NormalizedSectionDegreeZero
+public import MMP.AlgebraicGeometry.MMP.Abundance.Defs
+import MMP.AlgebraicGeometry.SpreadingOut.CoefficientModelProperties
+import MMP.AlgebraicGeometry.Singularities.Adjunction.DltStep
+import MMP.AlgebraicGeometry.Singularities.Adjunction.ResidueDifferentExistence
+import MMP.AlgebraicGeometry.MMP.Fourfold.Flip.StratumDiscrepancyMonotone
+import MMP.AlgebraicGeometry.Singularities.Adjunction.EffectiveResidueAdjunction
+import MMP.AlgebraicGeometry.Singularities.Adjunction.SmoothDivisorResidueRestriction
+import MMP.AlgebraicGeometry.Singularities.Adjunction.ResidueDifferentEffective
+import MMP.AlgebraicGeometry.Singularities.Adjunction.PoincareResidueSmoothDivisor
+import MMP.AlgebraicGeometry.Singularities.CrepantBoundaryPushforward
+import MMP.AlgebraicGeometry.Resolution.CommonLogResolution
+import MMP.AlgebraicGeometry.Singularities.Semismooth.Basic
+import MMP.AlgebraicGeometry.Morphisms.Smooth.RegularParametersCharZero
+import MMP.AlgebraicGeometry.Singularities.LocalGenerator
+import StacksFrontier.AlgebraicGeometry.AmpleDimensionOne.Basic
+import MMP.AlgebraicGeometry.Singularities.Adjunction.CyclicQuotientDifferent
+import StacksFrontier.AlgebraicGeometry.Properties.Dimension
+import StacksFrontier.AlgebraicGeometry.CoherentPushforwardCriteria.ClosureSubscheme
+import MMP.AlgebraicGeometry.Singularities.DivisorOverValuationIso
+import MMP.AlgebraicGeometry.Curves.RationalFunctionDegree
+import MMP.AlgebraicGeometry.MMP.Flip.FlipLocus
+import MMP.AlgebraicGeometry.SpreadingOut.CartesianFibres
+import MMP.AlgebraicGeometry.SpreadingOut.CanonicalDivisor
+import MMP.AlgebraicGeometry.Divisor.SectionAlgebra.Cartier
+import MMP.AlgebraicGeometry.MMP.Fourfold.GoodModelFixedParts
+import MMP.AlgebraicGeometry.Singularities.LogDiscrepancyComparison
+import MMP.AlgebraicGeometry.Resolution.Surface.PointBlowupCurvePullback
+import MMP.AlgebraicGeometry.Singularities.LogCanonicalOneResolution
+import MMP.AlgebraicGeometry.Singularities.SncStrata.ZeroPlaceExtraction
+import MMP.AlgebraicGeometry.Singularities.FiniteLowDiscrepancyKlt
+import MMP.AlgebraicGeometry.Divisor.Canonical.TopFormGenerator
+public import MMP.AlgebraicGeometry.Singularities.MonomialValuationSnc
+
+/-!
+# Log forms, Poincaré residues and residue fields of monomial valuations
+
+General material for residues of crepant pull-backs along floor curves of surface pairs.
+
+* Logarithmic two-forms `dx/x ∧ dy/y` in exterior powers of Kähler differentials, their
+  pluriform powers, pull-backs along homomorphisms of function fields, and their Poincaré
+  residues along a prime divisor.
+* Local generators: at a point of a simple normal crossing pair where two boundary components
+  of coefficient one meet, a rational section of `m(K_X + B)` is `g (dx/x ∧ dy/y)^{⊗m}` with
+  `g` in the local ring.
+* Divisors over a surface with log discrepancy zero: their centres are closed points where two
+  boundary components of coefficient one cross.
+* Weighted monomial ideals and the residue field of a monomial valuation of coprime weight
+  `(a, b)` in a regular system of parameters `x, y`: it is generated by the class of
+  `y^a x^{-b}`.
+* Unit forms and generators of function fields of points and curves: if `w` generates the
+  function field of a normal curve and vanishes along a prime divisor, then it vanishes there to
+  order one.
+
+## Main results
+
+* `MMP.Fourfold.exists_stalk_eq_smul_formPow_dlog_of_isSNC_restrict`
+* `MMP.Fourfold.exists_mem_adjoin_valuation_mul_sub_lt_one`
+* `MMP.Fourfold.eq_one_of_adjoin_eq_top_of_ord_pos`
+
+## References
+
+* [Kollár, *Singularities of the minimal model program*][kollar2013singularities]
+-/
+
+@[expose] public section
+
+open CategoryTheory AlgebraicGeometry MMP.Mori
+
+attribute [-instance] AlgebraicGeometry.IsVariety.toIsIntegral
+
+universe u
+
+namespace MMP.Fourfold
+
+section LogForms
+
+open exteriorPower
+
+/-- **Wedges of two linear combinations.** `(αp + βq) ∧ (γp + δq) = (αδ - βγ) p ∧ q`. -/
+theorem ιMulti_two_smul_add_smul {K M : Type*} [CommRing K] [AddCommGroup M] [Module K M] (p q : M)
+    (α β γ δ : K) :
+    ιMulti K 2 ![α • p + β • q, γ • p + δ • q] = (α * δ - β * γ) • ιMulti K 2 ![p, q] := by
+  have u0 : ∀ a b w : M, Function.update ![a, w] 0 b = ![b, w] := fun a b w => by
+    ext i; fin_cases i <;> simp
+  have u1 : ∀ a b w : M, Function.update ![w, a] 1 b = ![w, b] := fun a b w => by
+    ext i; fin_cases i <;> simp
+  have hpp : ιMulti K 2 ![p, p] = 0 :=
+    (ιMulti K 2).map_eq_zero_of_eq ![p, p] (i := 0) (j := 1) rfl (by decide)
+  have hqq : ιMulti K 2 ![q, q] = 0 :=
+    (ιMulti K 2).map_eq_zero_of_eq ![q, q] (i := 0) (j := 1) rfl (by decide)
+  have hqp : ιMulti K 2 ![q, p] = - ιMulti K 2 ![p, q] := by
+    have := (ιMulti K 2).map_swap ![p, q] (i := 0) (j := 1) (by decide)
+    convert this using 2
+    ext i; fin_cases i <;> rfl
+  have e1 : ∀ u v w : M, ιMulti K 2 ![u + v, w] = ιMulti K 2 ![u, w] + ιMulti K 2 ![v, w] := by
+    intro u v w
+    have := (ιMulti K 2).map_update_add ![u, w] 0 u v
+    rwa [u0, u0, u0] at this
+  have e2 : ∀ u v w : M, ιMulti K 2 ![w, u + v] = ιMulti K 2 ![w, u] + ιMulti K 2 ![w, v] := by
+    intro u v w
+    have := (ιMulti K 2).map_update_add ![w, u] 1 u v
+    rwa [u1, u1, u1] at this
+  have s1 : ∀ (c : K) (u w : M), ιMulti K 2 ![c • u, w] = c • ιMulti K 2 ![u, w] := by
+    intro c u w
+    have := (ιMulti K 2).map_update_smul ![u, w] 0 c u
+    rwa [u0, u0] at this
+  have s2 : ∀ (c : K) (u w : M), ιMulti K 2 ![w, c • u] = c • ιMulti K 2 ![w, u] := by
+    intro c u w
+    have := (ιMulti K 2).map_update_smul ![w, u] 1 c u
+    rwa [u1, u1] at this
+  simp only [e1, e2, s1, s2, hpp, hqq, hqp, smul_zero, zero_add, add_zero, smul_neg, sub_smul,
+    smul_smul]
+  abel
+
+/-- `ιMulti` in degree one is linear in its single argument. -/
+theorem ιMulti_one_smul {K M : Type*} [CommRing K] [AddCommGroup M] [Module K M] (c : K) (v : M) :
+    ιMulti K 1 ![c • v] = c • ιMulti K 1 ![v] := by
+  have := (ιMulti K 1).map_smul_univ (fun _ => c) ![v]
+  rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin, pow_one] at this
+  rw [← this]
+  congr 1
+  ext i; fin_cases i; rfl
+
+/-- **The differential of a Laurent monomial**:
+`d(f^c g^d) = f^c g^d (c df/f + d dg/g)`. -/
+theorem kaehlerD_zpow_mul_zpow {k K : Type*} [CommRing k] [Field K] [Algebra k K] {f g : K}
+    (hf : f ≠ 0) (hg : g ≠ 0) (c d : ℤ) :
+    KaehlerDifferential.D k K (f ^ c * g ^ d) = (f ^ c * g ^ d) •
+      ((c : K) • f⁻¹ • KaehlerDifferential.D k K f +
+        (d : K) • g⁻¹ • KaehlerDifferential.D k K g) := by
+  rw [Derivation.leibniz, Derivation.leibniz_zpow, Derivation.leibniz_zpow,
+    ← Int.cast_smul_eq_zsmul K, ← Int.cast_smul_eq_zsmul K, zpow_sub_one₀ hf, zpow_sub_one₀ hg]
+  simp only [smul_add, smul_smul]
+  module
+
+/-- **Unimodular change of logarithmic coordinates.** If `ac + bd = 1`, then with
+`t = x^c y^d` and `z = y^a x^{-b}` one has `dt/t ∧ dz = z · dx/x ∧ dy/y`, i.e.
+`dlog t ∧ dlog z = dlog x ∧ dlog y`. -/
+theorem inv_smul_ιMulti_kaehlerD_zpow {k K : Type*} [CommRing k] [Field K] [Algebra k K] {x y : K}
+    (hx : x ≠ 0) (hy : y ≠ 0) {a b c d : ℤ} (hcd : a * c + b * d = 1) :
+    (x ^ c * y ^ d)⁻¹ • ιMulti K 2 ![KaehlerDifferential.D k K (x ^ c * y ^ d),
+      KaehlerDifferential.D k K (y ^ a * x ^ (-b))] =
+      (y ^ a * x ^ (-b)) • ιMulti K 2 ![x⁻¹ • KaehlerDifferential.D k K x,
+        y⁻¹ • KaehlerDifferential.D k K y] := by
+  have h0 : x ^ c * y ^ d ≠ 0 := mul_ne_zero (zpow_ne_zero _ hx) (zpow_ne_zero _ hy)
+  set p := x⁻¹ • KaehlerDifferential.D k K x
+  set q := y⁻¹ • KaehlerDifferential.D k K y
+  rw [kaehlerD_zpow_mul_zpow hx hy, kaehlerD_zpow_mul_zpow hy hx]
+  have hv : ![(x ^ c * y ^ d) • ((c : K) • p + (d : K) • q),
+      (y ^ a * x ^ (-b)) • ((a : K) • q + ((-b : ℤ) : K) • p)] =
+      ![((x ^ c * y ^ d) * c) • p + ((x ^ c * y ^ d) * d) • q,
+        ((y ^ a * x ^ (-b)) * ((-b : ℤ) : K)) • p + ((y ^ a * x ^ (-b)) * a) • q] := by
+    simp only [smul_add, smul_smul, add_comm]
+  rw [hv, ιMulti_two_smul_add_smul, smul_smul]
+  congr 1
+  have hcd' : (a : K) * c + b * d = 1 := by
+    have := congrArg (fun n : ℤ => (n : K)) hcd
+    push_cast at this
+    exact this
+  rw [Int.cast_neg]
+  calc (x ^ c * y ^ d)⁻¹ * (x ^ c * y ^ d * c * (y ^ a * x ^ (-b) * a) -
+        x ^ c * y ^ d * d * (y ^ a * x ^ (-b) * -b))
+      = (x ^ c * y ^ d)⁻¹ * (x ^ c * y ^ d) * (y ^ a * x ^ (-b)) * (a * c + b * d) := by ring
+    _ = y ^ a * x ^ (-b) := by rw [inv_mul_cancel₀ h0, hcd']; ring
+
+end LogForms
+
+section PoincareResidue
+
+variable {k : Type} [Field k] {Y T : Scheme.{0}} (sY : Y ⟶ Spec (.of k)) [IsIntegral Y]
+  [IsLocallyNoetherian Y] [IsIntegral T] (j : T ⟶ Y)
+
+/-- Multiplying a form by a constant `c ∈ k` multiplies its Poincaré residue by `c`. -/
+theorem IsPoincareResidue.const_smul {n m : ℕ} {τ : RationalPluriForms sY (n + 1) m}
+    {ρ : RationalPluriForms (j ≫ sY) n m} (h : IsPoincareResidue sY j n m τ ρ) (c : k) :
+    IsPoincareResidue sY j n m (c • τ) (c • ρ) := by
+  letI := stalkAlgebra sY (j (genericPoint T))
+  letI := functionFieldAlgebra sY
+  letI := functionFieldAlgebra (j ≫ sY)
+  haveI := isScalarTower_stalk_functionField sY (j (genericPoint T))
+  obtain ⟨t, g, x, ht, hτ, hρ⟩ := h
+  refine ⟨t, algebraMap k _ c * g, x, ht, ?_, ?_⟩
+  · rw [RationalPluriForms.smul_def, hτ, map_mul, mul_smul, ← IsScalarTower.algebraMap_apply]
+    rfl
+  · have hc : (j.stalkMap (genericPoint T)).hom (algebraMap k _ c) =
+        algebraMap k T.functionField c :=
+      MMP.Threefold.Resolution.stalkMap_algebraMap (sX := sY) j (genericPoint T) c
+    rw [RationalPluriForms.smul_def, hρ, map_mul, mul_smul, hc]
+    rfl
+
+/-- Poincaré residues over equal structure morphisms: the relation transports along `HEq`. -/
+theorem IsPoincareResidue.of_heq {s s' : Y ⟶ Spec (.of k)} (hs : s = s') {n m : ℕ}
+    {τ : RationalPluriForms s (n + 1) m} {τ' : RationalPluriForms s' (n + 1) m}
+    {ρ : RationalPluriForms (j ≫ s) n m} {ρ' : RationalPluriForms (j ≫ s') n m}
+    (hτ : HEq τ τ') (hρ : HEq ρ ρ') (h : IsPoincareResidue s j n m τ ρ) :
+    IsPoincareResidue s' j n m τ' ρ' := by
+  subst hs
+  cases hτ
+  cases hρ
+  exact h
+
+omit [IsIntegral Y] [IsLocallyNoetherian Y] [IsIntegral T] in
+/-- Scalar multiples of forms over equal structure morphisms which are `HEq` are `HEq`. -/
+theorem RationalPluriForms.smul_heq {s s' : T ⟶ Spec (.of k)} [IsIntegral T] (hs : s = s')
+    {n : ℕ} {m : ℤ} {x : RationalPluriForms s n m} {x' : RationalPluriForms s' n m}
+    (hx : HEq x x') (c : k) : HEq (c • x) (c • x') := by
+  subst hs
+  cases hx
+  rfl
+
+/-- **Residues of products with functions of constant restriction.** If `f ∈ k(Y)` restricts to
+the constant `a ∈ k` along `T` (that is, `f - a` vanishes along `T`), then
+`Res_T(f τ) = a Res_T τ`. -/
+theorem IsPoincareResidue.smul_of_ord_sub_pos [IsNormal Y]
+    (hcoh : Order.coheight (j (genericPoint T)) = 1) {n m : ℕ}
+    {τ : RationalPluriForms sY (n + 1) m} {ρ : RationalPluriForms (j ≫ sY) n m}
+    (h : IsPoincareResidue sY j n m τ ρ) (f : Y.functionField) (a : k)
+    (hf : letI := functionFieldAlgebra sY
+      f - algebraMap k _ a = 0 ∨ 0 < Y.ord (f - algebraMap k _ a) (j (genericPoint T))) :
+    IsPoincareResidue sY j n m (f • τ) (a • ρ) := by
+  letI := stalkAlgebra sY (j (genericPoint T))
+  letI := functionFieldAlgebra sY
+  letI := functionFieldAlgebra (j ≫ sY)
+  haveI := isScalarTower_stalk_functionField sY (j (genericPoint T))
+  -- `f - a` comes from an element `φ₀` of `𝒪_{Y,T}` restricting to zero on `T`
+  obtain ⟨φ₀, hφ₀, hφ₀T⟩ : ∃ φ₀ : Y.presheaf.stalk (j (genericPoint T)),
+      algebraMap _ Y.functionField φ₀ = f - algebraMap k _ a ∧
+        (j.stalkMap (genericPoint T)).hom φ₀ = 0 := by
+    by_cases hz : f - algebraMap k Y.functionField a = 0
+    · exact ⟨0, by rw [map_zero, hz], map_zero _⟩
+    have hpos := hf.resolve_left hz
+    obtain ⟨φ₀, hφ₀⟩ :=
+      (Scheme.mem_range_algebraMap_stalk_iff_zero_le_ord hcoh hz).mpr hpos.le
+    refine ⟨φ₀, hφ₀, ?_⟩
+    by_contra hne
+    have hu : IsUnit φ₀ := by
+      by_contra hnu
+      exact hne (not_not.mp fun h0 => hnu (isUnit_of_map_unit (j.stalkMap (genericPoint T)).hom _
+        (isUnit_iff_ne_zero.mpr h0)))
+    obtain ⟨u, hu⟩ := hu.exists_right_inv
+    have hinv : (f - algebraMap k Y.functionField a)⁻¹ ∈
+        (algebraMap (Y.presheaf.stalk (j (genericPoint T))) Y.functionField).range := by
+      refine ⟨u, ?_⟩
+      rw [← hφ₀]
+      exact eq_inv_of_mul_eq_one_right (by rw [← map_mul, hu, map_one])
+    have h1 := (Scheme.mem_range_algebraMap_stalk_iff_zero_le_ord hcoh (inv_ne_zero hz)).mp hinv
+    have h2 := MMP.Mori.ord_zpow (j (genericPoint T)) hz (-1)
+    rw [zpow_neg, zpow_one] at h2
+    rw [h2] at h1
+    omega
+  obtain ⟨t, g, x, ht, hτ, hρ⟩ := h
+  refine ⟨t, (φ₀ + algebraMap k _ a) * g, x, ht, ?_, ?_⟩
+  · have hφ : algebraMap _ Y.functionField (φ₀ + algebraMap k _ a) = f := by
+      rw [map_add, hφ₀, ← IsScalarTower.algebraMap_apply, sub_add_cancel]
+    rw [hτ, map_mul, mul_smul, hφ]
+    rfl
+  · have hc : (j.stalkMap (genericPoint T)).hom (algebraMap k _ a) =
+        algebraMap k T.functionField a :=
+      MMP.Threefold.Resolution.stalkMap_algebraMap (sX := sY) j (genericPoint T) a
+    rw [RationalPluriForms.smul_def, hρ, map_mul, mul_smul, map_add, hφ₀T, zero_add, hc]
+    rfl
+
+open exteriorPower in
+/-- **The residue of `(dx/x ∧ dy/y)^{⊗m}` along a divisor.** Let `T ⊂ Y` be a closed integral
+subscheme whose generic point has codimension one in the normal scheme `Y`, and `x, y ∈ k(Y)^×`
+with orders `a, b` along `T`. If some Laurent monomial `x^c y^d` is a uniformizer
+(`ac + bd = 1`), then `z = y^a x^{-b}` is a unit along `T` and
+`Res_T (dx/x ∧ dy/y)^{⊗m} = (dz̄/z̄)^{⊗m}`. -/
+theorem isPoincareResidue_tprod_ιMulti_dlog [IsNormal Y]
+    (hcoh : Order.coheight (j (genericPoint T)) = 1) (m : ℕ) {x y : Y.functionField}
+    (hx : x ≠ 0) (hy : y ≠ 0) {a b c d : ℤ} (ha : Y.ord x (j (genericPoint T)) = a)
+    (hb : Y.ord y (j (genericPoint T)) = b) (hcd : a * c + b * d = 1) :
+    letI := functionFieldAlgebra sY
+    letI := functionFieldAlgebra (j ≫ sY)
+    ∃ z : Y.presheaf.stalk (j (genericPoint T)), IsUnit z ∧
+      algebraMap _ Y.functionField z = y ^ a * x ^ (-b) ∧
+      IsPoincareResidue sY j 1 m
+        (PiTensorProduct.tprod Y.functionField (fun _ : Fin m => ιMulti Y.functionField 2
+          ![x⁻¹ • KaehlerDifferential.D k Y.functionField x,
+            y⁻¹ • KaehlerDifferential.D k Y.functionField y]) :
+          TensorPower Y.functionField m (⋀[Y.functionField]^2 Ω[Y.functionField⁄k]))
+        (PiTensorProduct.tprod T.functionField (fun _ : Fin m => ιMulti T.functionField 1
+          ![((j.stalkMap (genericPoint T)).hom z)⁻¹ •
+            KaehlerDifferential.D k T.functionField ((j.stalkMap (genericPoint T)).hom z)]) :
+          TensorPower T.functionField m (⋀[T.functionField]^1 Ω[T.functionField⁄k])) := by
+  letI := functionFieldAlgebra sY
+  letI := functionFieldAlgebra (j ≫ sY)
+  set η := j (genericPoint T)
+  set Z := y ^ a * x ^ (-b) with hZdef
+  set U := x ^ c * y ^ d with hUdef
+  have hZ0 : Z ≠ 0 := mul_ne_zero (zpow_ne_zero _ hy) (zpow_ne_zero _ hx)
+  have hU0 : U ≠ 0 := mul_ne_zero (zpow_ne_zero _ hx) (zpow_ne_zero _ hy)
+  have hordZ : Y.ord Z η = 0 := by
+    rw [hZdef, Scheme.ord_mul (zpow_ne_zero _ hy) (zpow_ne_zero _ hx), ord_zpow _ hy,
+      ord_zpow _ hx, ha, hb]
+    ring
+  have hordZi : Y.ord Z⁻¹ η = 0 := by
+    rw [← zpow_neg_one, ord_zpow _ hZ0, hordZ, mul_zero]
+  have hordU : Y.ord U η = 1 := by
+    rw [hUdef, Scheme.ord_mul (zpow_ne_zero _ hx) (zpow_ne_zero _ hy), ord_zpow _ hx,
+      ord_zpow _ hy, ha, hb]
+    linear_combination hcd
+  obtain ⟨z, hz⟩ := (Scheme.mem_range_algebraMap_stalk_iff_zero_le_ord hcoh hZ0).mpr hordZ.ge
+  obtain ⟨w, hw⟩ := (Scheme.mem_range_algebraMap_stalk_iff_zero_le_ord hcoh
+    (inv_ne_zero hZ0)).mpr hordZi.ge
+  obtain ⟨t, ht⟩ := (Scheme.mem_range_algebraMap_stalk_iff_zero_le_ord hcoh hU0).mpr
+    (by rw [hordU]; exact zero_le_one)
+  have hzw : z * w = 1 := IsFractionRing.injective _ Y.functionField <| by
+    rw [map_mul, hz, hw, map_one, mul_inv_cancel₀ hZ0]
+  have hzw' : (j.stalkMap (genericPoint T)).hom w = ((j.stalkMap (genericPoint T)).hom z)⁻¹ :=
+    eq_inv_of_mul_eq_one_right (by rw [← map_mul, hzw, map_one])
+  refine ⟨z, ⟨⟨z, w, hzw, by rw [mul_comm, hzw]⟩, rfl⟩, hz, t, w ^ m, ![z], by rw [ht]; exact hordU, ?_, ?_⟩
+  · have hv : (Fin.cons (KaehlerDifferential.D k Y.functionField (algebraMap _ _ t))
+        fun i : Fin 1 => KaehlerDifferential.D k Y.functionField (algebraMap _ _ (![z] i))) =
+        ![KaehlerDifferential.D k Y.functionField U, KaehlerDifferential.D k Y.functionField Z] := by
+      ext i; fin_cases i <;> simp [ht, hz]
+    rw [hv, ht, inv_smul_ιMulti_kaehlerD_zpow hx hy hcd, map_pow, hw]
+    rw [MultilinearMap.map_smul_univ, Finset.prod_const, Finset.card_univ, Fintype.card_fin,
+      smul_smul, ← mul_pow, inv_mul_cancel₀ hZ0, one_pow, one_smul]
+  · have hv : (fun i : Fin 1 => KaehlerDifferential.D k T.functionField
+        ((j.stalkMap (genericPoint T)).hom (![z] i))) =
+        ![KaehlerDifferential.D k T.functionField ((j.stalkMap (genericPoint T)).hom z)] := by
+      ext i; fin_cases i; rfl
+    rw [hv, map_pow, hzw']
+    simp only [ιMulti_one_smul]
+    rw [MultilinearMap.map_smul_univ, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
+
+end PoincareResidue
+
+section PullbackLogForms
+
+open exteriorPower
+
+/-- On a variety of dimension `d` over a perfect field, a nonzero rational `d`-form spans the line
+`Ω^d_{k(X)/k}`. -/
+theorem span_singleton_topForms_eq_top {k : Type} [Field k] [PerfectField k] {X : Scheme.{0}}
+    {sX : X ⟶ Spec (.of k)} [IsIntegral X] [LocallyOfFiniteType sX] {d : ℕ}
+    (hd : topologicalKrullDim X = d)
+    {ω : letI := functionFieldAlgebra sX; ⋀[X.functionField]^d Ω[X.functionField⁄k]}
+    (hω : ω ≠ 0) : Submodule.span X.functionField {ω} = ⊤ := by
+  let := functionFieldAlgebra sX
+  obtain ⟨b⟩ := exists_basis_topForms (sX := sX) hd
+  have hc := basis_unit_repr_smul b ω
+  have hc0 : b.repr ω () ≠ 0 := by
+    intro h; rw [h, zero_smul] at hc; exact hω hc.symm
+  rw [← hc, Submodule.span_singleton_smul_eq (IsUnit.mk0 _ hc0)]
+  have := b.span_eq
+  rwa [Set.range_unique] at this
+
+/-- **Pull-back of `(dx/x ∧ dy/y)^{⊗m}`** along a homomorphism of function fields of surfaces:
+`φ^*(dx/x ∧ dy/y)^{⊗m} = (dφx/φx ∧ dφy/φy)^{⊗m}`, when `dx ∧ dy ≠ 0`. -/
+theorem pluriformPullback_formPow_ιMulti_dlog {k : Type} [Field k] [CharZero k] {X X' : Scheme.{0}}
+    {sX : X ⟶ Spec (.of k)} {sX' : X' ⟶ Spec (.of k)} [IsIntegral X] [IsIntegral X']
+    [LocallyOfFiniteType sX] [LocallyOfFiniteType sX'] (hX : topologicalKrullDim X = 2)
+    (hX' : topologicalKrullDim X' = 2) (φ : FunctionFieldHom sX sX') {x y : X'.functionField}
+    (h0 : letI := functionFieldAlgebra sX'
+      ιMulti X'.functionField 2 ![x⁻¹ • KaehlerDifferential.D k X'.functionField x,
+        y⁻¹ • KaehlerDifferential.D k X'.functionField y] ≠ 0) (m : ℕ) :
+    letI := functionFieldAlgebra sX'
+    letI := functionFieldAlgebra sX
+    pluriformPullback sX sX' φ 2 m (formPow (ιMulti X'.functionField 2
+        ![x⁻¹ • KaehlerDifferential.D k X'.functionField x,
+          y⁻¹ • KaehlerDifferential.D k X'.functionField y]) m) =
+      formPow (ιMulti X.functionField 2
+        ![(φ x)⁻¹ • KaehlerDifferential.D k X.functionField (φ x),
+          (φ y)⁻¹ • KaehlerDifferential.D k X.functionField (φ y)]) m := by
+  let := functionFieldAlgebra sX'
+  let := functionFieldAlgebra sX
+  have hgen := isPullbackGenerator_functionFieldHom (sX := sX) (sX' := sX') (d := 2)
+    (by exact_mod_cast hX) (by exact_mod_cast hX') φ
+    (span_singleton_topForms_eq_top (by exact_mod_cast hX') h0) h0
+  have h := pluriformPullback_smul_formPow φ hgen m 1
+  rw [one_smul, map_one, one_smul] at h
+  rw [h]
+  congr 1
+  let : Algebra X'.functionField X.functionField := φ.toRingHom.toAlgebra
+  rw [topFormsMap_ιMulti]
+  congr 1
+  ext i
+  fin_cases i <;>
+  · simp only [Fin.zero_eta, Fin.isValue, Matrix.cons_val_zero, Fin.mk_one, Matrix.cons_val_one,
+      Matrix.cons_val_fin_one, map_smul, KaehlerDifferential.map_D]
+    rw [← algebraMap_smul X.functionField, map_inv₀]
+    rfl
+
+/-- **The residue of a pulled-back logarithmic form along a divisor.** Let `σ : k(X') → k(Y)`
+be a homomorphism of function fields of surfaces, `P = j(T)` a prime divisor of the normal surface
+`Y`, and `x, y ∈ k(X')^×` with `dx ∧ dy ≠ 0` whose pull-backs have orders `a, b` along `P`. If
+`ac + bd = 1`, then `z = σ(y)^a σ(x)^{-b}` is a unit along `P` and
+`Res_P σ^*(dx/x ∧ dy/y)^{⊗m} = (dz̄/z̄)^{⊗m}`. -/
+theorem isPoincareResidue_pluriformPullback_formPow_dlog {k : Type} [Field k] [CharZero k]
+    {Y X' T : Scheme.{0}} {sY : Y ⟶ Spec (.of k)} {sX' : X' ⟶ Spec (.of k)} [IsIntegral Y]
+    [IsLocallyNoetherian Y] [IsNormal Y] [IsIntegral X'] [IsIntegral T] [LocallyOfFiniteType sY]
+    [LocallyOfFiniteType sX'] (hY : topologicalKrullDim Y = 2) (hX' : topologicalKrullDim X' = 2)
+    (j : T ⟶ Y) (hcoh : Order.coheight (j (genericPoint T)) = 1) (σ : FunctionFieldHom sY sX')
+    {x y : X'.functionField}
+    (h0 : letI := functionFieldAlgebra sX'
+      ιMulti X'.functionField 2 ![x⁻¹ • KaehlerDifferential.D k X'.functionField x,
+        y⁻¹ • KaehlerDifferential.D k X'.functionField y] ≠ 0) (hx : x ≠ 0) (hy : y ≠ 0)
+    {a b c d : ℤ} (ha : Y.ord (σ x) (j (genericPoint T)) = a)
+    (hb : Y.ord (σ y) (j (genericPoint T)) = b) (hcd : a * c + b * d = 1) (m : ℕ) :
+    letI := functionFieldAlgebra sX'
+    letI := functionFieldAlgebra sY
+    letI := functionFieldAlgebra (j ≫ sY)
+    ∃ z : Y.presheaf.stalk (j (genericPoint T)), IsUnit z ∧
+      algebraMap _ Y.functionField z = σ y ^ a * σ x ^ (-b) ∧
+      IsPoincareResidue sY j 1 m
+        (pluriformPullback sY sX' σ 2 m (formPow (ιMulti X'.functionField 2
+          ![x⁻¹ • KaehlerDifferential.D k X'.functionField x,
+            y⁻¹ • KaehlerDifferential.D k X'.functionField y]) m))
+        (formPow (ιMulti T.functionField 1
+          ![((j.stalkMap (genericPoint T)).hom z)⁻¹ •
+            KaehlerDifferential.D k T.functionField ((j.stalkMap (genericPoint T)).hom z)]) m) := by
+  letI := functionFieldAlgebra sX'
+  letI := functionFieldAlgebra sY
+  have hσx : σ x ≠ 0 := (map_ne_zero σ).mpr hx
+  have hσy : σ y ≠ 0 := (map_ne_zero σ).mpr hy
+  rw [pluriformPullback_formPow_ιMulti_dlog hY hX' σ h0 m]
+  exact isPoincareResidue_tprod_ιMulti_dlog sY j hcoh m hσx hσy ha hb hcd
+
+end PullbackLogForms
+
+section LocalGenerator
+
+open exteriorPower
+
+/-- **Forms with logarithmic poles along two local equations.** Let `X` be a normal integral
+scheme over `k`, `p ∈ X` and `x, y ∈ 𝒪_{X,p}` such that `dx ∧ dy` generates `Ω²_{𝒪_{X,p}/k}`
+and is nonzero in `Ω²_{k(X)/k}`. A rational `m`-canonical form `τ` with
+`ord_Γ τ + m (ord_Γ x + ord_Γ y) ≥ 0` along every prime divisor `Γ` through `p` is
+`g (dx/x ∧ dy/y)^{⊗m}` for some `g ∈ 𝒪_{X,p}`. -/
+theorem exists_stalk_eq_smul_formPow_dlog {k : Type} [Field k] {X : Scheme.{0}}
+    {sX : X ⟶ Spec (.of k)} [IsIntegral X] [IsLocallyNoetherian X] [IsNormal X] (p : X)
+    {x y : X.presheaf.stalk p}
+    (hσ : letI := stalkAlgebra sX p
+      Submodule.span (X.presheaf.stalk p) {(ιMulti (X.presheaf.stalk p) 2
+        ![KaehlerDifferential.D k (X.presheaf.stalk p) x,
+          KaehlerDifferential.D k (X.presheaf.stalk p) y])} = ⊤)
+    (h0 : letI := stalkAlgebra sX p
+      letI := functionFieldAlgebra sX
+      haveI := isScalarTower_stalk_functionField sX p
+      topFormsMap k (X.presheaf.stalk p) X.functionField 2 (ιMulti (X.presheaf.stalk p) 2
+        ![KaehlerDifferential.D k (X.presheaf.stalk p) x,
+          KaehlerDifferential.D k (X.presheaf.stalk p) y]) ≠ 0)
+    {m : ℕ} (τ : RationalPluriForms sX 2 m)
+    (hτ : ∀ Γ : MMP.Mori.PrimeDivisor X, p ∈ Γ.support → τ ≠ 0 →
+      0 ≤ Γ.ordForm τ + m * (X.ord (algebraMap _ X.functionField x) Γ.genericPoint +
+        X.ord (algebraMap _ X.functionField y) Γ.genericPoint)) :
+    letI := functionFieldAlgebra sX
+    ∃ g : X.presheaf.stalk p, τ = algebraMap _ X.functionField g •
+      (formPow (ιMulti X.functionField 2
+        ![(algebraMap _ X.functionField x)⁻¹ •
+            KaehlerDifferential.D k X.functionField (algebraMap _ X.functionField x),
+          (algebraMap _ X.functionField y)⁻¹ •
+            KaehlerDifferential.D k X.functionField (algebraMap _ X.functionField y)]) m :
+        RationalPluriForms sX 2 m) := by
+  letI := stalkAlgebra sX p
+  letI := functionFieldAlgebra sX
+  haveI := isScalarTower_stalk_functionField sX p
+  set x' := algebraMap (X.presheaf.stalk p) X.functionField x with hx'
+  set y' := algebraMap (X.presheaf.stalk p) X.functionField y with hy'
+  have hD : topFormsMap k (X.presheaf.stalk p) X.functionField 2 (ιMulti (X.presheaf.stalk p) 2
+      ![KaehlerDifferential.D k (X.presheaf.stalk p) x,
+        KaehlerDifferential.D k (X.presheaf.stalk p) y]) =
+      ιMulti X.functionField 2 ![KaehlerDifferential.D k X.functionField x',
+        KaehlerDifferential.D k X.functionField y'] := by
+    rw [topFormsMap_ιMulti]
+    congr 1
+    ext i
+    fin_cases i <;> simp [KaehlerDifferential.map_D, hx', hy']
+  have hx0 : x' ≠ 0 := by
+    intro h
+    apply h0
+    rw [hD]
+    exact (ιMulti X.functionField 2).map_coord_zero 0 (by simp [h])
+  have hy0 : y' ≠ 0 := by
+    intro h
+    apply h0
+    rw [hD]
+    exact (ιMulti X.functionField 2).map_coord_zero 1 (by simp [h])
+  have hlog : ιMulti X.functionField 2 ![x'⁻¹ • KaehlerDifferential.D k X.functionField x',
+      y'⁻¹ • KaehlerDifferential.D k X.functionField y'] =
+      (x'⁻¹ * y'⁻¹) • ιMulti X.functionField 2 ![KaehlerDifferential.D k X.functionField x',
+        KaehlerDifferential.D k X.functionField y'] := by
+    have := ιMulti_two_smul_add_smul (KaehlerDifferential.D k X.functionField x')
+      (KaehlerDifferential.D k X.functionField y') x'⁻¹ 0 0 y'⁻¹
+    simpa using this
+  have hpow : ∀ (c : X.functionField) (ω : ⋀[X.functionField]^2 Ω[X.functionField⁄k]),
+      (formPow (c • ω) m : PluriForms k X.functionField 2 m) = c ^ m • formPow ω m := by
+    intro c ω
+    unfold formPow
+    rw [show (fun _ : Fin m => c • ω) = fun i : Fin m => (fun _ => c) i • (fun _ => ω) i from rfl,
+      MultilinearMap.map_smul_univ, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
+    rfl
+  set f := formCoeff (k := k) (m := m) (X.presheaf.stalk p) hσ h0 τ with hf
+  have hτf : τ = f • (formPow (ιMulti X.functionField 2
+      ![KaehlerDifferential.D k X.functionField x', KaehlerDifferential.D k X.functionField y'])
+      m : PluriForms k X.functionField 2 m) := by
+    have h := formCoeff_smul_basis (m := m) hσ h0 τ
+    rw [ZTensorPower.basis_natCast, topFormsBasis_apply, hD] at h
+    exact h.symm
+  set g₀ := f * (x' * y') ^ m with hg₀
+  have hτg : τ = g₀ • (formPow (ιMulti X.functionField 2
+      ![x'⁻¹ • KaehlerDifferential.D k X.functionField x',
+        y'⁻¹ • KaehlerDifferential.D k X.functionField y']) m : PluriForms k X.functionField 2 m) := by
+    rw [hlog, hpow, smul_smul, hg₀, mul_assoc, ← mul_pow, mul_mul_mul_comm, mul_inv_cancel₀ hx0,
+      mul_inv_cancel₀ hy0, one_mul, one_pow, mul_one]
+    exact hτf
+  by_cases hτ0 : τ = 0
+  · exact ⟨0, by rw [map_zero, zero_smul]; exact hτ0⟩
+  have hf0 : f ≠ 0 := fun h => hτ0 ((formCoeff_eq_zero_iff (m := m) hσ h0 τ).mp h)
+  have hg0 : g₀ ≠ 0 := mul_ne_zero hf0 (pow_ne_zero _ (mul_ne_zero hx0 hy0))
+  obtain ⟨g, hg⟩ := MMP.Threefold.Bridges.exists_algebraMap_stalk_eq_of_forall_zero_le_ord p hg0
+    fun Γ hΓ => by
+      have h := hτ Γ hΓ hτ0
+      rw [MMP.Threefold.Resolution.ordForm_eq_ord_formCoeff sX p Γ hΓ hσ h0 τ] at h
+      rw [hg₀, ← zpow_natCast, Scheme.ord_mul hf0 (zpow_ne_zero _ (mul_ne_zero hx0 hy0)),
+        ord_zpow _ (mul_ne_zero hx0 hy0), Scheme.ord_mul hx0 hy0]
+      exact h
+  exact ⟨g, by rw [hg]; exact hτg⟩
+
+/-- **Orders of a logarithmic form near `p`.** If `x, y ∈ 𝒪_{X,p}` and `dx ∧ dy` generates
+`Ω²_{𝒪_{X,p}/k}` and is nonzero in `Ω²_{k(X)/k}`, then along every prime divisor `Γ` through `p`,
+`ord_Γ (dx/x ∧ dy/y)^{⊗m} = -m (ord_Γ x + ord_Γ y)`. -/
+theorem ordForm_formPow_dlog_of_mem_support {k : Type} [Field k] {X : Scheme.{0}}
+    {sX : X ⟶ Spec (.of k)} [IsIntegral X] [IsLocallyNoetherian X] [IsNormal X] (p : X)
+    {x y : X.presheaf.stalk p}
+    (hσ : letI := stalkAlgebra sX p
+      Submodule.span (X.presheaf.stalk p) {(ιMulti (X.presheaf.stalk p) 2
+        ![KaehlerDifferential.D k (X.presheaf.stalk p) x,
+          KaehlerDifferential.D k (X.presheaf.stalk p) y])} = ⊤)
+    (h0 : letI := stalkAlgebra sX p
+      letI := functionFieldAlgebra sX
+      haveI := isScalarTower_stalk_functionField sX p
+      topFormsMap k (X.presheaf.stalk p) X.functionField 2 (ιMulti (X.presheaf.stalk p) 2
+        ![KaehlerDifferential.D k (X.presheaf.stalk p) x,
+          KaehlerDifferential.D k (X.presheaf.stalk p) y]) ≠ 0)
+    (m : ℕ) (Γ : MMP.Mori.PrimeDivisor X) (hΓ : p ∈ Γ.support) :
+    letI := functionFieldAlgebra sX
+    Γ.ordForm (show RationalPluriForms sX 2 m from formPow (ιMulti X.functionField 2
+        ![(algebraMap _ X.functionField x)⁻¹ •
+            KaehlerDifferential.D k X.functionField (algebraMap _ X.functionField x),
+          (algebraMap _ X.functionField y)⁻¹ •
+            KaehlerDifferential.D k X.functionField (algebraMap _ X.functionField y)]) m) =
+      -(m : ℤ) * (X.ord (algebraMap _ X.functionField x) Γ.genericPoint +
+        X.ord (algebraMap _ X.functionField y) Γ.genericPoint) := by
+  letI := stalkAlgebra sX p
+  letI := functionFieldAlgebra sX
+  haveI := isScalarTower_stalk_functionField sX p
+  set x' := algebraMap (X.presheaf.stalk p) X.functionField x with hx'
+  set y' := algebraMap (X.presheaf.stalk p) X.functionField y with hy'
+  have hD : topFormsMap k (X.presheaf.stalk p) X.functionField 2 (ιMulti (X.presheaf.stalk p) 2
+      ![KaehlerDifferential.D k (X.presheaf.stalk p) x,
+        KaehlerDifferential.D k (X.presheaf.stalk p) y]) =
+      ιMulti X.functionField 2 ![KaehlerDifferential.D k X.functionField x',
+        KaehlerDifferential.D k X.functionField y'] := by
+    rw [topFormsMap_ιMulti]
+    congr 1
+    ext i
+    fin_cases i <;> simp [KaehlerDifferential.map_D, hx', hy']
+  have hx0 : x' ≠ 0 := by
+    intro h
+    apply h0
+    rw [hD]
+    exact (ιMulti X.functionField 2).map_coord_zero 0 (by simp [h])
+  have hy0 : y' ≠ 0 := by
+    intro h
+    apply h0
+    rw [hD]
+    exact (ιMulti X.functionField 2).map_coord_zero 1 (by simp [h])
+  have hlog : ιMulti X.functionField 2 ![x'⁻¹ • KaehlerDifferential.D k X.functionField x',
+      y'⁻¹ • KaehlerDifferential.D k X.functionField y'] =
+      (x'⁻¹ * y'⁻¹) • ιMulti X.functionField 2 ![KaehlerDifferential.D k X.functionField x',
+        KaehlerDifferential.D k X.functionField y'] := by
+    have := ιMulti_two_smul_add_smul (KaehlerDifferential.D k X.functionField x')
+      (KaehlerDifferential.D k X.functionField y') x'⁻¹ 0 0 y'⁻¹
+    simpa using this
+  have hb : (formPow (ιMulti X.functionField 2 ![KaehlerDifferential.D k X.functionField x',
+        KaehlerDifferential.D k X.functionField y']) m : PluriForms k X.functionField 2 m) =
+      ZTensorPower.basis (topFormsBasis (k := k) (K := X.functionField) (X.presheaf.stalk p) hσ h0)
+        (m : ℤ) () := by
+    rw [ZTensorPower.basis_natCast, topFormsBasis_apply, hD]
+  have hc1 : formCoeff (k := k) (m := (m : ℤ)) (X.presheaf.stalk p) hσ h0
+      (ZTensorPower.basis (topFormsBasis (k := k) (K := X.functionField) (X.presheaf.stalk p) hσ h0)
+        (m : ℤ) ()) = 1 := by
+    simp [formCoeff]
+  have hne : x'⁻¹ * y'⁻¹ ≠ 0 := mul_ne_zero (inv_ne_zero hx0) (inv_ne_zero hy0)
+  rw [MMP.Threefold.Resolution.ordForm_eq_ord_formCoeff sX p Γ hΓ hσ h0, hlog, formPow_smul, hb,
+    formCoeff_smul, hc1, mul_one, ← zpow_natCast, ord_zpow _ hne,
+    Scheme.ord_mul (inv_ne_zero hx0) (inv_ne_zero hy0), ← zpow_neg_one, ord_zpow _ hx0,
+    ← zpow_neg_one, ord_zpow _ hy0]
+  ring
+
+/-- **`K_X + B` vanishes near a crossing.** Let `p` lie on exactly two components `Q₁ ≠ Q₂` of
+`B`, both with coefficient one, with local equations `x, y ∈ 𝒪_{X,p}` such that `dx ∧ dy`
+generates `Ω²_{𝒪_{X,p}/k}`. Then `p` is off the support of `div(dx/x ∧ dy/y) + B`. -/
+theorem notMem_supp_topFormDivisor_dlog_add {k : Type} [Field k] {X : Scheme.{0}}
+    {sX : X ⟶ Spec (.of k)} [IsIntegral X] [IsLocallyNoetherian X] [IsNormal X] [CompactSpace X]
+    [LocallyOfFiniteType sX] (p : X)
+    {B : QDivisor X} {Q₁ Q₂ : MMP.Mori.PrimeDivisor X} (hne : Q₁ ≠ Q₂) (h₁ : B.coeff Q₁ = 1)
+    (h₂ : B.coeff Q₂ = 1) (hp₁ : p ∈ Q₁.support) (hp₂ : p ∈ Q₂.support)
+    (hQ : ∀ Γ : MMP.Mori.PrimeDivisor X, B.coeff Γ ≠ 0 → p ∈ Γ.support → Γ = Q₁ ∨ Γ = Q₂)
+    {x y : X.presheaf.stalk p}
+    (hx : IdealSheafData.stalk Q₁.idealSheaf p = Ideal.span {x})
+    (hy : IdealSheafData.stalk Q₂.idealSheaf p = Ideal.span {y})
+    (hσ : letI := stalkAlgebra sX p
+      Submodule.span (X.presheaf.stalk p) {(ιMulti (X.presheaf.stalk p) 2
+        ![KaehlerDifferential.D k (X.presheaf.stalk p) x,
+          KaehlerDifferential.D k (X.presheaf.stalk p) y])} = ⊤)
+    (h0 : letI := stalkAlgebra sX p
+      letI := functionFieldAlgebra sX
+      haveI := isScalarTower_stalk_functionField sX p
+      topFormsMap k (X.presheaf.stalk p) X.functionField 2 (ιMulti (X.presheaf.stalk p) 2
+        ![KaehlerDifferential.D k (X.presheaf.stalk p) x,
+          KaehlerDifferential.D k (X.presheaf.stalk p) y]) ≠ 0) :
+    letI := functionFieldAlgebra sX
+    p ∉ (Divisor.toQDivisor (topFormDivisor sX (ιMulti X.functionField 2
+        ![(algebraMap _ X.functionField x)⁻¹ •
+            KaehlerDifferential.D k X.functionField (algebraMap _ X.functionField x),
+          (algebraMap _ X.functionField y)⁻¹ •
+            KaehlerDifferential.D k X.functionField (algebraMap _ X.functionField y)])) +
+        B).supp := by
+  letI := functionFieldAlgebra sX
+  set ωt : RationalTopForms sX 2 := ιMulti X.functionField 2
+    ![(algebraMap _ X.functionField x)⁻¹ •
+        KaehlerDifferential.D k X.functionField (algebraMap _ X.functionField x),
+      (algebraMap _ X.functionField y)⁻¹ •
+        KaehlerDifferential.D k X.functionField (algebraMap _ X.functionField y)] with hωt
+  intro hmem
+  obtain ⟨Γ, hΓ0, hΓs⟩ := DivisorWithCoeffs.mem_supp_iff.mp hmem
+  apply hΓ0
+  have hord : (topFormDivisor sX ωt).coeff Γ = -((1 : ℕ) : ℤ) *
+      (X.ord (algebraMap _ X.functionField x) Γ.genericPoint +
+        X.ord (algebraMap _ X.functionField y) Γ.genericPoint) :=
+    ordForm_formPow_dlog_of_mem_support (sX := sX) p hσ h0 1 Γ hΓs
+  have hox := SNCWeight.LocalEquation.ord_localEq Γ Q₁ hΓs hp₁ hx
+  have hoy := SNCWeight.LocalEquation.ord_localEq Γ Q₂ hΓs hp₂ hy
+  rw [DivisorWithCoeffs.coeff_add, Divisor.coeff_toQDivisor, hord]
+  by_cases hΓ₁ : Γ = Q₁
+  · subst hΓ₁
+    rw [if_pos rfl] at hox
+    rw [if_neg hne] at hoy
+    rw [hox, hoy, h₁]
+    norm_num
+  by_cases hΓ₂ : Γ = Q₂
+  · subst hΓ₂
+    rw [if_neg (Ne.symm hne)] at hox
+    rw [if_pos rfl] at hoy
+    rw [hox, hoy, h₂]
+    norm_num
+  have hb0 : B.coeff Γ = 0 := by
+    by_contra hb0
+    rcases hQ Γ hb0 hΓs with h' | h'
+    · exact hΓ₁ h'
+    · exact hΓ₂ h'
+  rw [if_neg hΓ₁] at hox
+  rw [if_neg hΓ₂] at hoy
+  rw [hox, hoy, hb0]
+  norm_num
+
+/-- If `dx ∧ dy` is nonzero in `Ω²_{k(X)}` for `x, y ∈ 𝒪_{X,p}`, then `x, y ≠ 0` in `k(X)` and
+`dx/x ∧ dy/y ≠ 0`. -/
+theorem ne_zero_and_ιMulti_dlog_ne_zero_of_topFormsMap_ne_zero {k : Type} [Field k]
+    {X : Scheme.{0}} {sX : X ⟶ Spec (.of k)} [IsIntegral X] (p : X) {x y : X.presheaf.stalk p}
+    (h0 : letI := stalkAlgebra sX p
+      letI := functionFieldAlgebra sX
+      haveI := isScalarTower_stalk_functionField sX p
+      topFormsMap k (X.presheaf.stalk p) X.functionField 2 (ιMulti (X.presheaf.stalk p) 2
+        ![KaehlerDifferential.D k (X.presheaf.stalk p) x,
+          KaehlerDifferential.D k (X.presheaf.stalk p) y]) ≠ 0) :
+    letI := functionFieldAlgebra sX
+    algebraMap _ X.functionField x ≠ 0 ∧ algebraMap _ X.functionField y ≠ 0 ∧
+      ιMulti X.functionField 2 ![(algebraMap _ X.functionField x)⁻¹ •
+          KaehlerDifferential.D k X.functionField (algebraMap _ X.functionField x),
+        (algebraMap _ X.functionField y)⁻¹ •
+          KaehlerDifferential.D k X.functionField (algebraMap _ X.functionField y)] ≠ 0 := by
+  letI := stalkAlgebra sX p
+  letI := functionFieldAlgebra sX
+  haveI := isScalarTower_stalk_functionField sX p
+  set x' := algebraMap (X.presheaf.stalk p) X.functionField x with hx'
+  set y' := algebraMap (X.presheaf.stalk p) X.functionField y with hy'
+  have hD : topFormsMap k (X.presheaf.stalk p) X.functionField 2 (ιMulti (X.presheaf.stalk p) 2
+      ![KaehlerDifferential.D k (X.presheaf.stalk p) x,
+        KaehlerDifferential.D k (X.presheaf.stalk p) y]) =
+      ιMulti X.functionField 2 ![KaehlerDifferential.D k X.functionField x',
+        KaehlerDifferential.D k X.functionField y'] := by
+    rw [topFormsMap_ιMulti]
+    congr 1
+    ext i
+    fin_cases i <;> simp [KaehlerDifferential.map_D, hx', hy']
+  have hx0 : x' ≠ 0 := by
+    intro h
+    apply h0
+    rw [hD]
+    exact (ιMulti X.functionField 2).map_coord_zero 0 (by simp [h])
+  have hy0 : y' ≠ 0 := by
+    intro h
+    apply h0
+    rw [hD]
+    exact (ιMulti X.functionField 2).map_coord_zero 1 (by simp [h])
+  have hlog : ιMulti X.functionField 2 ![x'⁻¹ • KaehlerDifferential.D k X.functionField x',
+      y'⁻¹ • KaehlerDifferential.D k X.functionField y'] =
+      (x'⁻¹ * y'⁻¹) • ιMulti X.functionField 2 ![KaehlerDifferential.D k X.functionField x',
+        KaehlerDifferential.D k X.functionField y'] := by
+    have := ιMulti_two_smul_add_smul (KaehlerDifferential.D k X.functionField x')
+      (KaehlerDifferential.D k X.functionField y') x'⁻¹ 0 0 y'⁻¹
+    simpa using this
+  refine ⟨hx0, hy0, ?_⟩
+  rw [hlog]
+  exact smul_ne_zero (mul_ne_zero (inv_ne_zero hx0) (inv_ne_zero hy0)) (hD ▸ h0)
+
+end LocalGenerator
+
+/-- **Values at the centre.** Let `D` be a divisor over a variety `X` over an algebraically closed
+field whose centre is a closed point `p`. Every `g ∈ 𝒪_{X,p}` differs from its value `a ∈ k` at
+`p` by a function vanishing along `D`: `v_D(g - a) < 1`. -/
+theorem DivisorOver.exists_valuation_sub_lt_one {k : Type} [Field k] [IsAlgClosed k] {X : Scheme.{0}}
+    {sX : X ⟶ Spec (.of k)} [IsIntegral X] [LocallyOfFiniteType sX] (D : DivisorOver k sX)
+    (hc : IsClosed ({D.f D.E.genericPoint} : Set X)) (g : X.presheaf.stalk (D.f D.E.genericPoint)) :
+    letI := functionFieldAlgebra sX
+    ∃ a : k, D.valuation (algebraMap _ X.functionField g - algebraMap k _ a) < 1 := by
+  letI := stalkAlgebra sX (D.f D.E.genericPoint)
+  letI := functionFieldAlgebra sX
+  haveI := isScalarTower_stalk_functionField sX (D.f D.E.genericPoint)
+  obtain ⟨a, ha⟩ := MMP.Mori.SurfaceAux.residue_surjective sX _ hc (Ideal.Quotient.mk _ g)
+  refine ⟨a, ?_⟩
+  have hmem : g - algebraMap k _ a ∈ IsLocalRing.maximalIdeal _ := by
+    rw [← Ideal.Quotient.eq, ← ha]
+    rfl
+  have := MMP.Positivity.DivisorOver.valuation_algebraMap_lt_one D _ rfl _ hmem
+  rwa [map_sub, ← IsScalarTower.algebraMap_apply] at this
+
+open TopologicalSpace in
+/-- **Exceptional divisors have centres of codimension at least two.** The centre of a divisor
+exceptional over a normal variety has codimension at least two. -/
+theorem DivisorOver.two_le_coheight_of_isExceptional {k : Type} [Field k] {X : Scheme.{0}}
+    {sX : X ⟶ Spec (.of k)} [IsIntegral X] [IsLocallyNoetherian X] [IsNormal X]
+    (hX : IsNormalVariety k sX) (D : DivisorOver k sX) (hD : D.IsExceptional) :
+    2 ≤ Order.coheight (D.f D.E.genericPoint) := by
+  haveI := D.isLocallyNoetherian
+  haveI := D.isNormal
+  haveI : IsSeparated sX := hX.1.toIsSeparated
+  have hsep : IsSeparated (X ↘ ⊤_ Scheme) := by
+    have : (X ↘ ⊤_ Scheme) = sX ≫ Limits.terminal.from (Spec (.of k)) := Subsingleton.elim _ _
+    rw [this]
+    infer_instance
+  unfold DivisorOver.IsExceptional at hD
+  rw [MMP.Positivity.isExceptional_toRationalMap_iff] at hD
+  have hc : Closeds.closure (D.f '' (D.E.idealSheaf.support : Set D.Y)) =
+      ⟨(D.center : Set X), D.center.isClosed⟩ := by
+    refine Closeds.ext ?_
+    rw [Closeds.coe_closure]
+    exact D.coe_center.symm
+  rw [hc] at hD
+  change 2 ≤ closedsCodimension (T := X) ⟨(D.center : Set X), D.center.isClosed⟩ at hD
+  rwa [closedsCodimension_coe, MMP.Positivity.DivisorOver.codimension_center] at hD
+
+/-- **Exceptional divisors over a surface are centred at points of codimension two.** -/
+theorem DivisorOver.coheight_eq_two_of_isExceptional {k : Type} [Field k] {X : Scheme.{0}}
+    {sX : X ⟶ Spec (.of k)} [IsIntegral X] [IsLocallyNoetherian X] [IsNormal X]
+    (hX : IsNormalVariety k sX) (hd : topologicalKrullDim X = 2) (D : DivisorOver k sX)
+    (hD : D.IsExceptional) : Order.coheight (D.f D.E.genericPoint) = 2 := by
+  refine le_antisymm ?_ (DivisorOver.two_le_coheight_of_isExceptional hX D hD)
+  have hkd : Order.krullDim X = 2 := by
+    rw [← Order.krullDim_eq_of_orderIso (irreducibleSetEquivPoints (α := X))]
+    exact hd
+  have := Order.coheight_le_krullDim (D.f D.E.genericPoint)
+  rw [hkd] at this
+  exact WithBot.coe_le_coe.mp this
+
+/-- **Exceptional divisors over a surface have closed centres.** The centre of a divisor
+exceptional over a normal surface is a closed point. -/
+theorem DivisorOver.isClosed_singleton_of_isExceptional {k : Type} [Field k] {X : Scheme.{0}}
+    {sX : X ⟶ Spec (.of k)} [IsIntegral X] [IsLocallyNoetherian X] [IsNormal X]
+    (hX : IsNormalVariety k sX) (hd : topologicalKrullDim X = 2) (D : DivisorOver k sX)
+    (hD : D.IsExceptional) : IsClosed ({D.f D.E.genericPoint} : Set X) :=
+  MMP.Mori.isClosed_singleton_of_two_le_coheight hd
+    (DivisorOver.two_le_coheight_of_isExceptional hX D hD)
+
+/-- **Residues of pulled-back sections at an exceptional divisor with closed centre.** Let
+`σ : k(X') ≅ k(Y)` carry the valuation of the prime divisor `P = j(T)` of `Y` to that of a divisor
+`D` over `X'` whose centre is a closed point `p`, and let `ω` be a rational form on `X'` whose
+pull-back has residue `ρ` along `T`. For every `g ∈ 𝒪_{X',p}` the residue of `σ^*(g ω)` along `T`
+is `g(p) ρ`. -/
+theorem IsPoincareResidue.pluriformPullback_smul_of_isClosed_center {k : Type} [Field k]
+    [IsAlgClosed k] {Y X' T : Scheme.{0}} {sY : Y ⟶ Spec (.of k)} {sX' : X' ⟶ Spec (.of k)}
+    [IsIntegral Y] [IsLocallyNoetherian Y] [IsNormal Y] [IsIntegral X'] [LocallyOfFiniteType sX']
+    [IsIntegral T] {j : T ⟶ Y} (P : MMP.Mori.PrimeDivisor Y) (hP : j (genericPoint T) = P.genericPoint)
+    (σ : FunctionFieldEquiv sY sX') (D : DivisorOver k sX')
+    (hDv : ∀ g, D.valuation g = P.divisorialValuation ((σ.toHom) g))
+    (hc : IsClosed ({D.f D.E.genericPoint} : Set X')) {d m : ℕ}
+    {ω : RationalPluriForms sX' (d + 1) m} {ρ : RationalPluriForms (j ≫ sY) d m}
+    (h : IsPoincareResidue sY j d m (pluriformPullback sY sX' σ.toHom (d + 1) m ω) ρ)
+    (g : X'.presheaf.stalk (D.f D.E.genericPoint)) :
+    ∃ a : k, IsPoincareResidue sY j d m
+      (pluriformPullback sY sX' σ.toHom (d + 1) m (algebraMap _ X'.functionField g • ω)) (a • ρ) := by
+  letI := functionFieldAlgebra sX'
+  letI := functionFieldAlgebra sY
+  obtain ⟨a, ha⟩ := DivisorOver.exists_valuation_sub_lt_one D hc g
+  refine ⟨a, ?_⟩
+  set f := algebraMap _ X'.functionField g
+  have hpb : pluriformPullback sY sX' σ.toHom (d + 1) m (f • ω) =
+      σ f • pluriformPullback sY sX' σ.toHom (d + 1) m ω := by
+    let : Algebra X'.functionField Y.functionField := σ.toHom.toRingHom.toAlgebra
+    have : IsScalarTower k X'.functionField Y.functionField :=
+      IsScalarTower.of_algebraMap_eq fun c => (σ.toHom.commutes c).symm
+    exact pullbackForms_smul (k := k) (K := X'.functionField) (K' := Y.functionField)
+      (d := d + 1) (m := m) f ω
+  rw [hpb]
+  have hcoh : Order.coheight (j (genericPoint T)) = 1 := hP ▸ P.coheight_genericPoint
+  refine h.smul_of_ord_sub_pos sY j hcoh _ a ?_
+  have hσa : σ f - algebraMap k Y.functionField a = σ (f - algebraMap k X'.functionField a) := by
+    rw [map_sub, AlgEquiv.commutes]
+  rw [hσa]
+  by_cases hz : σ (f - algebraMap k X'.functionField a) = 0
+  · exact Or.inl hz
+  refine Or.inr ?_
+  have hv := (hDv _).symm.trans_lt ha
+  change P.divisorialValuation (σ (f - algebraMap k X'.functionField a)) < 1 at hv
+  rw [P.divisorialValuation_eq_exp_neg_ord hz, ← hP] at hv
+  have : -Y.ord (σ (f - algebraMap k X'.functionField a)) (j (genericPoint T)) < 0 := by
+    rwa [← WithZero.exp_lt_exp, WithZero.exp_zero]
+  omega
+
+open exteriorPower in
+/-- **Residues of pulled-back sections near a crossing.** Let `σ : k(X') ≅ k(Y)` carry the
+valuation of the prime divisor `P = j(T)` of the normal surface `Y` to that of a divisor `D` over
+the surface `X'` whose centre is a closed point `p`, and let `x, y ∈ k(X')^×` with `dx ∧ dy ≠ 0`,
+`a = v_D(x)`, `b = v_D(y)` and `ac + bd = 1`. Then `z = σ(y)^a σ(x)^{-b}` is a unit along `P`
+and, for every `g ∈ 𝒪_{X',p}`, the residue along `P` of `σ^*(g (dx/x ∧ dy/y)^{⊗m})` is a constant
+multiple of `(dz̄/z̄)^{⊗m}`. -/
+theorem isPoincareResidue_pluriformPullback_smul_formPow_dlog {k : Type} [Field k]
+    [IsAlgClosed k] [CharZero k] {Y X' T : Scheme.{0}} {sY : Y ⟶ Spec (.of k)}
+    {sX' : X' ⟶ Spec (.of k)} [IsIntegral Y] [IsLocallyNoetherian Y] [IsNormal Y]
+    [LocallyOfFiniteType sY] [IsIntegral X'] [LocallyOfFiniteType sX'] [IsIntegral T]
+    (hY : topologicalKrullDim Y = 2) (hX' : topologicalKrullDim X' = 2) {j : T ⟶ Y}
+    (P : MMP.Mori.PrimeDivisor Y) (hP : j (genericPoint T) = P.genericPoint)
+    (σ : FunctionFieldEquiv sY sX') (D : DivisorOver k sX')
+    (hDv : ∀ g, D.valuation g = P.divisorialValuation ((σ.toHom) g))
+    (hc : IsClosed ({D.f D.E.genericPoint} : Set X')) {x y : X'.functionField}
+    (h0 : letI := functionFieldAlgebra sX'
+      ιMulti X'.functionField 2 ![x⁻¹ • KaehlerDifferential.D k X'.functionField x,
+        y⁻¹ • KaehlerDifferential.D k X'.functionField y] ≠ 0) (hx : x ≠ 0) (hy : y ≠ 0)
+    {a b c d : ℤ} (ha : Y.ord ((σ.toHom) x) (j (genericPoint T)) = a)
+    (hb : Y.ord ((σ.toHom) y) (j (genericPoint T)) = b) (hcd : a * c + b * d = 1) (m : ℕ) :
+    letI := functionFieldAlgebra sX'
+    letI := functionFieldAlgebra sY
+    letI := functionFieldAlgebra (j ≫ sY)
+    ∃ z : Y.presheaf.stalk (j (genericPoint T)), IsUnit z ∧
+      algebraMap _ Y.functionField z = (σ.toHom) y ^ a * (σ.toHom) x ^ (-b) ∧
+      ∀ g : X'.presheaf.stalk (D.f D.E.genericPoint), ∃ e : k,
+        IsPoincareResidue sY j 1 m
+          (pluriformPullback sY sX' σ.toHom 2 m (algebraMap _ X'.functionField g •
+            (formPow (ιMulti X'.functionField 2
+              ![x⁻¹ • KaehlerDifferential.D k X'.functionField x,
+                y⁻¹ • KaehlerDifferential.D k X'.functionField y]) m :
+              RationalPluriForms sX' 2 m)))
+          (e • (show RationalPluriForms (j ≫ sY) 1 m from formPow (ιMulti T.functionField 1
+            ![((j.stalkMap (genericPoint T)).hom z)⁻¹ •
+              KaehlerDifferential.D k T.functionField ((j.stalkMap (genericPoint T)).hom z)]) m))
+          := by
+  letI := functionFieldAlgebra sX'
+  letI := functionFieldAlgebra sY
+  have hcoh : Order.coheight (j (genericPoint T)) = 1 := hP ▸ P.coheight_genericPoint
+  obtain ⟨z, hz, hzv, hres⟩ := isPoincareResidue_pluriformPullback_formPow_dlog hY hX' j hcoh
+    σ.toHom h0 hx hy ha hb hcd m
+  exact ⟨z, hz, hzv, fun g =>
+    IsPoincareResidue.pluriformPullback_smul_of_isClosed_center P hP σ D hDv hc hres g⟩
+
+/-- Forms over equal structure morphisms which are `HEq`: one is zero if the other is. -/
+theorem RationalPluriForms.eq_zero_of_heq {k : Type} [Field k] {T : Scheme.{0}} [IsIntegral T]
+    {s s' : T ⟶ Spec (.of k)} (h : s = s') {d : ℕ} {m : ℤ} {x : RationalPluriForms s d m}
+    {y : RationalPluriForms s' d m} (hxy : HEq x y) (hx : x = 0) : y = 0 := by
+  subst h
+  rw [← eq_of_heq hxy, hx]
+
+/-- **The two log discrepancies agree.** A log discrepancy `a(D, X, B)` in the sense of
+Kollár–Mori (`MMP.Intersection.IsLogDiscrepancy`, computed on the proper model `D`) is a log
+discrepancy of the divisor `ord_D` of `k(X)` in the sense of Fujino's notes
+(`MMP.Flips.IsLogDiscrepancy`), for the canonical divisor `K_X = div ω` of the same computation. -/
+theorem exists_flipsIsLogDiscrepancy_of_isLogDiscrepancy {k : Type} [Field k] {X : Scheme.{0}}
+    {sX : X ⟶ Spec (.of k)} [IsIntegral X] [IsLocallyNoetherian X] [IsNormal X] [CompactSpace X]
+    [LocallyOfFiniteType sX] {n : ℕ} {B : RDivisor X} {D : DivisorOver k sX} {a : ℝ}
+    (h : MMP.Intersection.IsLogDiscrepancy sX n B D a) :
+    ∃ K : Divisor X, K.IsCanonicalDivisor sX n ∧
+      MMP.Flips.IsLogDiscrepancy sX n K B D.valuation a := by
+  haveI := D.isLocallyNoetherian
+  haveI := D.isNormal
+  obtain ⟨hX, hp, ω, hω0, ⟨K, hK, hKω⟩, m, r, C, C', hC, hsum, hpb, ha⟩ := h
+  have hdiv : divisorOfForm ω = K :=
+    DivisorWithCoeffs.ext' fun Γ => by rw [coeff_divisorOfForm, hKω]
+  let E : MMP.Flips.ProperDivisorOver k sX := ⟨D, hp⟩
+  have hpres : Divisor.toRDivisor K + B = ∑ j, r j • Divisor.toRDivisor (C j) := by
+    refine DivisorWithCoeffs.ext' fun Γ => ?_
+    rw [MMP.Flips.coeff_sum_smul_toRDivisor, DivisorWithCoeffs.coeff_add,
+      Divisor.coeff_toRDivisor, hKω, hsum Γ]
+  have hdivff : MMP.Flips.IsDivisorOfFunctionField k sX E.valuation := by
+    have := E.isIntegral
+    have := E.isDominant
+    let := functionFieldAlgebra sX
+    let := functionFieldAlgebra (E.f ≫ sX)
+    let := functionFieldMapAlgebra E.f
+    have := isScalarTower_functionFieldMap sX E.f
+    exact ⟨E.Y, E.f ≫ sX, E.isNormalVariety, E.E, AlgEquiv.ofBijective
+      (IsScalarTower.toAlgHom k X.functionField E.Y.functionField)
+      E.isBirationalMorphism.functionFieldMap_bijective, rfl⟩
+  refine ⟨K, hK, a - 1, ⟨hK, ⟨m, r, C, hC, hpres⟩, ⟨hdivff, E, rfl⟩, E, ω, m, r, C, rfl, hdiv,
+    hX, hK.topologicalKrullDim_eq, hω0, hC, hdiv ▸ hpres, C', hpb, ?_⟩, by ring⟩
+  rw [ha]
+  change _ = ((D.ordPullback ω : ℤ) : ℝ) - _
+  ring
+
+/-- A valuation with a log discrepancy `a` with respect to `(X, B)` (`HasLogDiscrepancy`) has log
+discrepancy `a` in the sense of `MMP.Flips.IsLogDiscrepancy`, for some canonical divisor; in
+particular it is the valuation of a divisor over `X` with proper structure map. -/
+theorem HasLogDiscrepancy.exists_flipsIsLogDiscrepancy {k : Type} [Field k] {X : Scheme.{0}}
+    {sX : X ⟶ Spec (.of k)} [IsIntegral X] [IsLocallyNoetherian X] [IsNormal X] [CompactSpace X]
+    [LocallyOfFiniteType sX] {B : QDivisor X} {v : Valuation X.functionField (WithZero (Multiplicative ℤ))} {a : ℝ}
+    (h : HasLogDiscrepancy sX B v a) :
+    ∃ (n : ℕ) (K : Divisor X), K.IsCanonicalDivisor sX n ∧
+      MMP.Flips.IsLogDiscrepancy sX n K (QDivisor.toRDivisor B) v a := by
+  obtain ⟨n, D, rfl, hD⟩ := h
+  exact ⟨n, exists_flipsIsLogDiscrepancy_of_isLogDiscrepancy hD⟩
+
+open Classical in
+/-- **Lc places over an snc divisor.** Let `Y` be a smooth variety over a perfect field, `S` an snc
+divisor on `Y` and `B` an `ℝ`-divisor supported on `S` whose coefficients along the components of
+`S` are at most one. If a divisor `ν` over `Y` has log discrepancy `0` with respect to `(Y, B)`,
+its centre `Z` lies on at least `codim_Y Z` components of `S` along which `B` has coefficient
+one. -/
+theorem codimension_center_le_card_of_isLogDiscrepancy_eq_zero {k : Type u} [Field k]
+    [PerfectField k] {Y : Scheme.{u}} (sY : Y ⟶ Spec (.of k)) [IsIntegral Y]
+    [IsLocallyNoetherian Y] [IsNormal Y] [CompactSpace Y] [LocallyOfFiniteType sY]
+    (hY : MMP.Mori.IsVariety k sY) (hsm : MMP.Mori.IsSmoothScheme sY) {S : Divisor Y}
+    (hS : MMP.Flips.IsSNCDivisor sY S) {B : RDivisor Y}
+    (hBS : ∀ P, B.coeff P ≠ 0 → P ∈ S.support) (hB1 : ∀ P ∈ S.support, B.coeff P ≤ 1)
+    (ν : MMP.Flips.ProperDivisorOver k sY) {d : ℕ} {K : Divisor Y}
+    (hb : MMP.Flips.IsLogDiscrepancy sY d K B ν.valuation 0) :
+    codimension ν.center ≤ ((S.support.filter fun P =>
+      (ν.center : Set Y) ⊆ P.support ∧ B.coeff P = 1).card : ℕ∞) := by
+  obtain ⟨l, n, hb0, -, hn, hcod, -⟩ :=
+    MMP.Flips.exists_logDiscrepancy_eq_add_sum_of_isSNCDivisor sY hY hsm hS hBS ν hb
+  have hterm : ∀ P ∈ S.support, 0 ≤ (n P : ℝ) * (1 - B.coeff P) := fun P hP =>
+    mul_nonneg (Nat.cast_nonneg _) (sub_nonneg.mpr (hB1 P hP))
+  have hsum := Finset.sum_nonneg hterm
+  have hl0 : (0 : ℝ) ≤ l := Nat.cast_nonneg l
+  have hl : l = 0 := by
+    have : (l : ℝ) = 0 := by linarith
+    exact_mod_cast this
+  have hs0 : ∑ P ∈ S.support, (n P : ℝ) * (1 - B.coeff P) = 0 := by linarith
+  have heach := (Finset.sum_eq_zero_iff_of_nonneg hterm).mp hs0
+  have hfilter : (S.support.filter fun P => (ν.center : Set Y) ⊆ P.support) =
+      S.support.filter fun P => (ν.center : Set Y) ⊆ P.support ∧ B.coeff P = 1 := by
+    refine Finset.filter_congr fun P hP => ⟨fun hZ => ⟨hZ, ?_⟩, And.left⟩
+    have hn0 : (n P : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr fun h => ((hn P hP).mp h) hZ
+    rcases mul_eq_zero.mp (heach P hP) with h | h
+    · exact absurd h hn0
+    · linarith
+  rw [← hfilter]
+  simpa [hl] using hcod
+
+/-- **Local equations at a crossing of two snc components.** Let `D` be an snc divisor on `Y` and
+`p` a point of codimension two on two distinct components `W₁, W₂` of `D`. Then `𝒪_{Y,p}` has a
+regular system of parameters `x, y` with `W₁ = (x)` and `W₂ = (y)` near `p`. -/
+theorem exists_isRegularSystemOfParameters_of_isSNC {R : Type*} [Zero R] {Y S : Scheme.{u}}
+    {f : Y ⟶ S} {D : DivisorWithCoeffs R Y} (hD : D.IsSNC f) {p : Y}
+    (hp : Order.coheight p = 2) {W₁ W₂ : MMP.Mori.PrimeDivisor Y} (h₁ : W₁ ∈ D.support)
+    (h₂ : W₂ ∈ D.support) (hp₁ : p ∈ W₁.support) (hp₂ : p ∈ W₂.support) (hne : W₁ ≠ W₂) :
+    ∃ x y : Y.presheaf.stalk p, MMP.Mori.IsRegularSystemOfParameters ![x, y] ∧
+      IdealSheafData.stalk W₁.idealSheaf p = Ideal.span {x} ∧
+      IdealSheafData.stalk W₂.idealSheaf p = Ideal.span {y} := by
+  obtain ⟨n, z, j, hz, hj, hI⟩ := hD.2 p
+  have hn : n = 2 := by
+    have h := hz.2
+    rw [ringKrullDim_stalk_eq_coheight, hp] at h
+    exact_mod_cast h.symm
+  subst hn
+  have hab : (j ⟨W₁, h₁, hp₁⟩).val ≠ (j ⟨W₂, h₂, hp₂⟩).val :=
+    fun h => hne (congrArg Subtype.val (hj (Fin.ext h)))
+  have hIa := hI ⟨W₁, h₁, hp₁⟩
+  have hIb := hI ⟨W₂, h₂, hp₂⟩
+  generalize j ⟨W₁, h₁, hp₁⟩ = a at hab hIa
+  generalize j ⟨W₂, h₂, hp₂⟩ = b at hab hIb
+  have hr : Set.range ![z a, z b] = Set.range z := by
+    refine Set.ext fun t => ⟨?_, ?_⟩
+    · rintro ⟨i, rfl⟩
+      fin_cases i
+      · exact ⟨a, rfl⟩
+      · exact ⟨b, rfl⟩
+    · rintro ⟨i, rfl⟩
+      have hia : i = a ∨ i = b := by
+        have := a.isLt
+        have := b.isLt
+        have := i.isLt
+        rw [Fin.ext_iff, Fin.ext_iff]
+        omega
+      rcases hia with rfl | rfl
+      · exact ⟨0, rfl⟩
+      · exact ⟨1, rfl⟩
+  exact ⟨z a, z b, ⟨by rw [hr]; exact hz.1, hz.2⟩, hIa, hIb⟩
+
+open TopologicalSpace in
+/-- **Local equations at a crossing in the snc locus.** Let `U ⊆ X` be an open subscheme on which
+the restriction of `B` is snc, and `p ∈ U` a point of codimension two lying on two distinct
+components `Q₁, Q₂` of `B`. Then `𝒪_{X,p}` has a regular system of parameters `x, y` with
+`Q₁ = (x)` and `Q₂ = (y)` near `p`. -/
+theorem exists_isRegularSystemOfParameters_of_isSNC_restrict {R : Type*} [AddCommMonoid R]
+    {k : Type} [Field k] {X : Scheme.{0}} {sX : X ⟶ Spec (.of k)} {B : DivisorWithCoeffs R X}
+    (U : X.Opens) (hsnc : DivisorWithCoeffs.IsSNC (U.ι ≫ sX) (MMP.Mori.inverseTransformDivisor U.ι B))
+    (p : U.toScheme) (hcoh : Order.coheight (U.ι p) = 2) {Q₁ Q₂ : MMP.Mori.PrimeDivisor X} (hne : Q₁ ≠ Q₂)
+    (h₁ : B.coeff Q₁ ≠ 0) (h₂ : B.coeff Q₂ ≠ 0) (hp₁ : U.ι p ∈ Q₁.support)
+    (hp₂ : U.ι p ∈ Q₂.support) :
+    ∃ x y : X.presheaf.stalk (U.ι p), MMP.Mori.IsRegularSystemOfParameters ![x, y] ∧
+      IdealSheafData.stalk Q₁.idealSheaf (U.ι p) = Ideal.span {x} ∧
+      IdealSheafData.stalk Q₂.idealSheaf (U.ι p) = Ideal.span {y} := by
+  obtain ⟨W₁, rfl⟩ := MMP.Threefold.Mori.OpenRestriction.exists_primeDivisorMap_eq_of_mem_support
+    U.ι Q₁ p hp₁
+  obtain ⟨W₂, rfl⟩ := MMP.Threefold.Mori.OpenRestriction.exists_primeDivisorMap_eq_of_mem_support
+    U.ι Q₂ p hp₂
+  have hmem : ∀ W : MMP.Mori.PrimeDivisor U, B.coeff (OpenWeilRestriction.primeDivisorMap U.ι W) ≠ 0 →
+      W ∈ (MMP.Mori.inverseTransformDivisor U.ι B).support := fun W h => by
+    rw [MMP.Mori.inverseTransformDivisor_ι_eq_restrictOpen (U := U)]
+    exact Finsupp.mem_support_iff.mpr h
+  have hcoh' : Order.coheight p = 2 := by rwa [← coheight_eq_of_isOpenImmersion U.ι]
+  obtain ⟨x, y, hxy, hx, hy⟩ := exists_isRegularSystemOfParameters_of_isSNC hsnc hcoh'
+    (hmem W₁ h₁) (hmem W₂ h₂)
+    ((MMP.Threefold.Mori.OpenRestriction.mem_support_primeDivisorMap_iff U.ι W₁ p).mp hp₁)
+    ((MMP.Threefold.Mori.OpenRestriction.mem_support_primeDivisorMap_iff U.ι W₂ p).mp hp₂)
+    (fun h => hne (by rw [h]))
+  let E : X.presheaf.stalk (U.ι p) ≃+* U.toScheme.presheaf.stalk p :=
+    (asIso (U.ι.stalkMap p)).commRingCatIsoToRingEquiv
+  have hEe : (E : X.presheaf.stalk (U.ι p) →+* U.toScheme.presheaf.stalk p) =
+      (U.ι.stalkMap p).hom := rfl
+  have hE : ∀ (W : MMP.Mori.PrimeDivisor U) (z : U.toScheme.presheaf.stalk p),
+      IdealSheafData.stalk W.idealSheaf p = Ideal.span {z} →
+      IdealSheafData.stalk (OpenWeilRestriction.primeDivisorMap U.ι W).idealSheaf (U.ι p) =
+        Ideal.span {E.symm z} := fun W z hz => by
+    rw [SNCWeight.Restriction.stalk_primeDivisorMap_comap U W p] at hz
+    rw [← Ideal.map_of_equiv (I := IdealSheafData.stalk
+      (OpenWeilRestriction.primeDivisorMap U.ι W).idealSheaf (U.ι p)) E]
+    rw [hEe, hz, Ideal.map_span, Set.image_singleton]
+    rfl
+  refine ⟨E.symm x, E.symm y, ?_, hE W₁ x hx, hE W₂ y hy⟩
+  have := MMP.Resolution.isRegularSystemOfParameters_map_ringEquiv E.symm hxy
+  convert this using 1
+  ext i
+  fin_cases i <;> rfl
+
+open TopologicalSpace exteriorPower in
+/-- **Log pluricanonical sections near a crossing of two coefficient-one curves.** Let `(X, B)`
+be a normal surface with a boundary `B`, `U ⊆ X` an open subscheme on which `B` is snc, and
+`p ∈ U` a point of codimension two lying on two distinct prime divisors `Q₁, Q₂` with coefficient
+one and on no other component of `B`. Then `𝒪_{X,p}` has a regular system of parameters `x, y`,
+local equations of `Q₁` and `Q₂`, such that `dx ∧ dy` generates `Ω²_{𝒪_{X,p}/k}`, and every
+section of `m(K_X + B)` is `g (dx/x ∧ dy/y)^{⊗m}` with `g ∈ 𝒪_{X,p}`. -/
+theorem exists_stalk_eq_smul_formPow_dlog_of_isSNC_restrict {k : Type} [Field k] [CharZero k]
+    {X : Scheme.{0}} {sX : X ⟶ Spec (.of k)} [IsIntegral X] [IsLocallyNoetherian X] [IsNormal X]
+    [LocallyOfFiniteType sX] (hd : topologicalKrullDim X = 2) {B : QDivisor X} (U : X.Opens)
+    (hsnc : DivisorWithCoeffs.IsSNC (U.ι ≫ sX) (MMP.Mori.inverseTransformDivisor U.ι B))
+    (p : U.toScheme) (hcoh : Order.coheight (U.ι p) = 2) {Q₁ Q₂ : MMP.Mori.PrimeDivisor X}
+    (hne : Q₁ ≠ Q₂) (h₁ : B.coeff Q₁ = 1) (h₂ : B.coeff Q₂ = 1) (hp₁ : U.ι p ∈ Q₁.support)
+    (hp₂ : U.ι p ∈ Q₂.support)
+    (hQ : ∀ Q : MMP.Mori.PrimeDivisor X, B.coeff Q ≠ 0 → U.ι p ∈ Q.support → Q = Q₁ ∨ Q = Q₂) :
+    letI := stalkAlgebra sX (U.ι p)
+    letI := functionFieldAlgebra sX
+    haveI := isScalarTower_stalk_functionField sX (U.ι p)
+    ∃ x y : X.presheaf.stalk (U.ι p), MMP.Mori.IsRegularSystemOfParameters ![x, y] ∧
+      IdealSheafData.stalk Q₁.idealSheaf (U.ι p) = Ideal.span {x} ∧
+      IdealSheafData.stalk Q₂.idealSheaf (U.ι p) = Ideal.span {y} ∧
+      Submodule.span (X.presheaf.stalk (U.ι p)) {(ιMulti (X.presheaf.stalk (U.ι p)) 2
+        ![KaehlerDifferential.D k (X.presheaf.stalk (U.ι p)) x,
+          KaehlerDifferential.D k (X.presheaf.stalk (U.ι p)) y])} = ⊤ ∧
+      topFormsMap k (X.presheaf.stalk (U.ι p)) X.functionField 2
+        (ιMulti (X.presheaf.stalk (U.ι p)) 2
+          ![KaehlerDifferential.D k (X.presheaf.stalk (U.ι p)) x,
+            KaehlerDifferential.D k (X.presheaf.stalk (U.ι p)) y]) ≠ 0 ∧
+      ∀ m : ℕ, ∀ τ ∈ logPluricanonicalSections sX 2 m B, ∃ g : X.presheaf.stalk (U.ι p),
+        τ = algebraMap _ X.functionField g •
+          (formPow (ιMulti X.functionField 2
+            ![(algebraMap _ X.functionField x)⁻¹ •
+                KaehlerDifferential.D k X.functionField (algebraMap _ X.functionField x),
+              (algebraMap _ X.functionField y)⁻¹ •
+                KaehlerDifferential.D k X.functionField (algebraMap _ X.functionField y)]) m :
+            RationalPluriForms sX 2 m) := by
+  letI := stalkAlgebra sX (U.ι p)
+  letI := functionFieldAlgebra sX
+  haveI := isScalarTower_stalk_functionField sX (U.ι p)
+  obtain ⟨x, y, hxy, hx, hy⟩ := exists_isRegularSystemOfParameters_of_isSNC_restrict U hsnc p hcoh
+    hne (by rw [h₁]; exact one_ne_zero) (by rw [h₂]; exact one_ne_zero) hp₁ hp₂
+  haveI := MMP.Mori.isRegularLocalRing_of_isRegularSystemOfParameters hxy
+  obtain ⟨r, w, hr, -, hspan, h0⟩ := exists_stalk_topForms_generator sX (n := 2)
+    (by exact_mod_cast hd) (U.ι p) hxy
+  obtain rfl : r = 0 := by omega
+  have hw : w = ![] := Subsingleton.elim _ _
+  subst hw
+  refine ⟨x, y, hxy, hx, hy, hspan, h0, fun m τ hτ => ?_⟩
+  refine exists_stalk_eq_smul_formPow_dlog (U.ι p) hspan h0 τ fun Γ hΓ hτ0 => ?_
+  have h := ((mem_logPluricanonicalSections sX).mp hτ).2 Γ ⟨U.ι p, hΓ, trivial⟩ hτ0
+  have hox := SNCWeight.LocalEquation.ord_localEq Γ Q₁ hΓ hp₁ hx
+  have hoy := SNCWeight.LocalEquation.ord_localEq Γ Q₂ hΓ hp₂ hy
+  rw [DivisorWithCoeffs.coeff_roundDown, DivisorWithCoeffs.coeff_smul, zsmul_eq_mul,
+    Int.cast_natCast] at h
+  by_cases hΓ₁ : Γ = Q₁
+  · rw [hΓ₁] at h hox hoy ⊢
+    rw [if_pos rfl] at hox
+    rw [if_neg hne] at hoy
+    rw [h₁, mul_one, Int.floor_natCast] at h
+    rw [hox, hoy]
+    linarith
+  by_cases hΓ₂ : Γ = Q₂
+  · rw [hΓ₂] at h hox hoy ⊢
+    rw [if_neg (Ne.symm hne)] at hox
+    rw [if_pos rfl] at hoy
+    rw [h₂, mul_one, Int.floor_natCast] at h
+    rw [hox, hoy]
+    linarith
+  have hb : B.coeff Γ = 0 := by
+    by_contra hb
+    rcases hQ Γ hb hΓ with h' | h'
+    · exact hΓ₁ h'
+    · exact hΓ₂ h'
+  rw [if_neg hΓ₁] at hox
+  rw [if_neg hΓ₂] at hoy
+  rw [hb, mul_zero, Int.floor_zero, add_zero] at h
+  rw [hox, hoy]
+  linarith
+
+/-- **Log discrepancies on a crepant model.** Let `f : Y ⟶ X` be a birational morphism of normal
+varieties and `Δ_Y` the crepant boundary of the pair `(X, Δ)` on `Y`, with `m(K_Y + Δ_Y)` Cartier
+whenever `m(K_X + Δ)` is. If a divisor `E` over `Y` (with proper model) carries the valuation of a
+divisor `D` over `X`, then `a_ℓ(E; Y, Δ_Y) = a_ℓ(D; X, Δ)`. -/
+theorem isLogDiscrepancy_of_isCrepantBoundary {k : Type} [Field k] [PerfectField k]
+    {X : Scheme.{0}} {sX : X ⟶ Spec (.of k)} [IsIntegral X] [IsLocallyNoetherian X] [IsNormal X]
+    {n : ℕ} {K : Divisor X} {Δ : QDivisor X} (hP : MMP.Mori.IsPair sX Δ)
+    (hK : K.IsCanonicalDivisor sX n) {Y : Scheme.{0}} (f : Y ⟶ X)
+    (hY : IsNormalVariety k (f ≫ sX)) (hf : IsBirationalMorphism f) {ΔY : QDivisor Y}
+    (hcb : IsCrepantBoundary sX n K Δ f hY hf ΔY) [IsIntegral Y] [IsLocallyNoetherian Y]
+    [IsNormal Y] {KY : Divisor Y} (hKY : KY.IsCanonicalDivisor (f ≫ sX) n)
+    (hCY : ∀ m : ℕ, 0 < m → ((m : ℤ) • (Divisor.toQDivisor K + Δ)).IsCartierDivisor →
+      ((m : ℤ) • (Divisor.toQDivisor KY + ΔY)).IsCartierDivisor)
+    (D : DivisorOver k sX) (E : DivisorOver k (f ≫ sX)) (hE : IsProper E.f)
+    (hv : haveI := hf.isDominant; E.valuation.comap (functionFieldMap f) = D.valuation) {a : ℝ}
+    (ha : MMP.Intersection.IsLogDiscrepancy sX n (QDivisor.toRDivisor Δ) D a) :
+    MMP.Intersection.IsLogDiscrepancy (f ≫ sX) n (QDivisor.toRDivisor ΔY) E a := by
+  haveI := hf.isDominant
+  set E' := MMP.Mori.IsPair.compDivisorOver f hY hf E
+  have hv' : E'.valuation = D.valuation :=
+    (MMP.Mori.IsPair.valuation_compDivisorOver f hY hf E).trans hv
+  obtain ⟨b, hb⟩ := MMP.Positivity.IsPair.exists_isDiscrepancy hP hK D
+  obtain ⟨b', hb'⟩ := MMP.Positivity.IsPair.exists_isDiscrepancy hP hK E'
+  obtain rfl := MMP.Threefold.Mori.ModelIndependence.isDiscrepancy_eq_of_center_eq hv'.symm
+    (MMP.Threefold.Mori.ModelIndependence.center_eq_of_valuation_eq hP.1 hv'.symm) hb hb'
+  have h1 := ((MMP.Threefold.Bridges.isLogDiscrepancy_iff_of_isDiscrepancy hb a).mp ha).2
+  rw [h1]
+  exact MMP.Threefold.Bridges.isLogDiscrepancy_one_add_of_isDiscrepancy
+    (MMP.Mori.IsPair.isDiscrepancy_of_compDivisorOver hP hK f hY hf hcb hKY hCY E hb') hE
+
+open Classical in
+/-- **A closed point of codimension two on two prime divisors is a component of their
+intersection.** -/
+theorem maximal_singleton_of_coheight_eq_two {X : Scheme.{u}} {p : X} (hp : IsClosed ({p} : Set X))
+    (hcoh : Order.coheight p = 2) {Q₁ Q₂ : MMP.Mori.PrimeDivisor X} (hne : Q₁ ≠ Q₂)
+    (hp₁ : p ∈ Q₁.support) (hp₂ : p ∈ Q₂.support) :
+    Maximal (fun S : Set X => IsIrreducible S ∧
+      S ⊆ ⋂ P ∈ ({Q₁, Q₂} : Finset (MMP.Mori.PrimeDivisor X)), (P.support : Set X)) {p} := by
+  classical
+  have hmemJ : ∀ P ∈ ({Q₁, Q₂} : Finset (MMP.Mori.PrimeDivisor X)), P = Q₁ ∨ P = Q₂ :=
+    fun P hP => by simpa using hP
+  have hpI : p ∈ ⋂ P ∈ ({Q₁, Q₂} : Finset (MMP.Mori.PrimeDivisor X)),
+      (P.support : Set X) := by
+    simp only [Set.mem_iInter]
+    intro P hP
+    rcases hmemJ P hP with rfl | rfl
+    · exact hp₁
+    · exact hp₂
+  refine ⟨⟨isIrreducible_singleton, Set.singleton_subset_iff.mpr hpI⟩, fun T ⟨hT, hTI⟩ hpT => ?_⟩
+  -- `T` is the closure of its generic point `η`, which specializes to `p`
+  have hpT' : p ∈ T := hpT rfl
+  obtain ⟨η, hη⟩ := QuasiSober.sober hT.closure isClosed_closure
+  have hηI : η ∈ ⋂ P ∈ ({Q₁, Q₂} : Finset (MMP.Mori.PrimeDivisor X)), (P.support : Set X) := by
+    have hcl : IsClosed (⋂ P ∈ ({Q₁, Q₂} : Finset (MMP.Mori.PrimeDivisor X)),
+        (P.support : Set X)) :=
+      isClosed_biInter fun P _ => P.idealSheaf.support.isClosed
+    exact hcl.closure_subset_iff.mpr hTI hη.mem
+  have hTη : T ⊆ closure {η} := hη.def ▸ subset_closure
+  by_cases hηp : η = p
+  · intro t ht
+    have := hTη ht
+    rwa [hηp, hp.closure_eq] at this
+  exfalso
+  have hηp' : η ⤳ p := specializes_iff_mem_closure.mpr (hTη hpT')
+  have hlt : p < η := (Scheme.le_iff_specializes.mpr hηp').lt_of_not_ge fun h =>
+    hηp (hηp'.antisymm (Scheme.le_iff_specializes.mp h)).eq
+  have hcη : Order.coheight η ≤ 1 := by
+    have := Order.coheight_add_one_le hlt
+    rw [hcoh] at this
+    by_contra h
+    have h2 : (2 : ℕ∞) ≤ Order.coheight η := Order.add_one_le_of_lt (not_le.mp h)
+    have : (2 : ℕ∞) + 1 ≤ 2 := (add_le_add h2 (le_refl (1 : ℕ∞))).trans this
+    exact absurd this (by decide)
+  have hgen : ∀ Q : MMP.Mori.PrimeDivisor X, η ∈ Q.support → η = Q.genericPoint := fun Q hQ => by
+    rw [AlgebraicGeometry.PrimeDivisor.support_eq_closure] at hQ
+    have hs : Q.genericPoint ⤳ η := specializes_iff_mem_closure.mpr hQ
+    by_contra hne'
+    have := Order.coheight_add_one_le ((Scheme.le_iff_specializes.mpr hs).lt_of_not_ge fun h =>
+      hne' ((Scheme.le_iff_specializes.mp h).antisymm hs).eq)
+    rw [Q.coheight_genericPoint] at this
+    exact absurd (this.trans hcη) (by decide)
+  have hη₁ := hgen Q₁ (by simp only [Set.mem_iInter] at hηI; exact hηI Q₁ (by simp))
+  have hη₂ := hgen Q₂ (by simp only [Set.mem_iInter] at hηI; exact hηI Q₂ (by simp))
+  exact hne (AlgebraicGeometry.PrimeDivisor.genericPoint_injective (hη₁.symm.trans hη₂))
+
+/-- **A crossing of two floor curves is a dlt stratum.** Let `(X, B)` be a dlt pair and `p` a
+closed point of codimension two lying on two distinct prime divisors `Q₁, Q₂` along which `B` has
+coefficient one. Then `{p}` is a boundary stratum of `(X, B)`: an irreducible component of
+`Q₁ ∩ Q₂`. -/
+theorem isDltStratum_singleton_of_coeff_eq_one {k : Type} [Field k] {X : Scheme.{0}}
+    {sX : X ⟶ Spec (.of k)} [IsIntegral X] [IsLocallyNoetherian X] [IsNormal X]
+    {B : QDivisor X} (hB : MMP.Intersection.IsDltPair sX B) {p : X} (hp : IsClosed ({p} : Set X))
+    (hcoh : Order.coheight p = 2) {Q₁ Q₂ : MMP.Mori.PrimeDivisor X} (hne : Q₁ ≠ Q₂)
+    (h₁ : B.coeff Q₁ = 1) (h₂ : B.coeff Q₂ = 1) (hp₁ : p ∈ Q₁.support)
+    (hp₂ : p ∈ Q₂.support) : IsDltStratum sX B {p} := by
+  classical
+  have hmemJ : ∀ P ∈ ({Q₁, Q₂} : Finset (MMP.Mori.PrimeDivisor X)), P = Q₁ ∨ P = Q₂ :=
+    fun P hP => by simpa using hP
+  have hmax := maximal_singleton_of_coheight_eq_two hp hcoh hne hp₁ hp₂
+  refine ⟨hB, {Q₁, Q₂}, ⟨Q₁, by simp⟩, fun P hP => ?_, ⟨p, hmax.1.2 rfl⟩, hmax⟩
+  rcases hmemJ P hP with rfl | rfl
+  · exact h₁.ge
+  · exact h₂.ge
+
+open Classical TopologicalSpace in
+/-- **Lc places centred in the snc locus of a pair.** Let `(X, B)` be a pair over an
+algebraically closed field with coefficients of `B` at most one, and `Z ⊆ X` a closed set off
+which `X` is smooth and `B` is snc. If a divisor `D` over `X` has log discrepancy `0` with respect
+to `(X, B)` and its centre `p` is a point of codimension two not in `Z`, then `p` lies on two
+distinct prime divisors along which `B` has coefficient one, and on no other component of `B`. -/
+theorem exists_ne_coeff_eq_one_of_isLogDiscrepancy_eq_zero {k : Type} [Field k] [IsAlgClosed k]
+    {X : Scheme.{0}} {sX : X ⟶ Spec (.of k)} [IsIntegral X] [IsLocallyNoetherian X] [IsNormal X]
+    {B : QDivisor X} (hB : MMP.Mori.IsPair sX B) (hB1 : ∀ P, B.coeff P ≤ 1) (Z : Closeds X)
+    (hsm : MMP.Mori.IsSmoothScheme (Scheme.Opens.ι (Z.compl : X.Opens) ≫ sX))
+    (hsnc : DivisorWithCoeffs.IsSNC (Scheme.Opens.ι (Z.compl : X.Opens) ≫ sX)
+      (MMP.Mori.inverseTransformDivisor (Scheme.Opens.ι (Z.compl : X.Opens)) B))
+    {n : ℕ} (D : DivisorOver k sX)
+    (hD : MMP.Intersection.IsLogDiscrepancy sX n (QDivisor.toRDivisor B) D 0)
+    (hDZ : D.f D.E.genericPoint ∉ (Z : Set X))
+    (hcoh : Order.coheight (D.f D.E.genericPoint) = 2) :
+    ∃ P Q : MMP.Mori.PrimeDivisor X, P ≠ Q ∧ B.coeff P = 1 ∧ B.coeff Q = 1 ∧
+      D.f D.E.genericPoint ∈ P.support ∧ D.f D.E.genericPoint ∈ Q.support ∧
+      ∀ P' : MMP.Mori.PrimeDivisor X, B.coeff P' ≠ 0 → D.f D.E.genericPoint ∈ P'.support →
+        P' = P ∨ P' = Q := by
+  set U : X.Opens := Z.compl with hU
+  have hpU : D.f D.E.genericPoint ∈ U := hDZ
+  haveI : Nonempty U := ⟨⟨_, hpU⟩⟩
+  have hXv := hB.1
+  haveI : AlgebraicGeometry.IsVariety k sX := hXv.1
+  haveI : LocallyOfFiniteType sX := hXv.1.toLocallyOfFiniteType
+  haveI : CompactSpace X := QuasiCompact.compactSpace_of_compactSpace sX
+  haveI : IsNoetherian X := {}
+  haveI : IsNormal U := inferInstance
+  haveI : CompactSpace U := inferInstance
+  haveI : AlgebraicGeometry.IsVariety k (U.ι ≫ sX) := ⟨⟩
+  obtain ⟨D', hD', hD'p⟩ := exists_isLogDiscrepancy_restrict hB U D hpU 0 hD
+  obtain ⟨K, -, hFl⟩ := exists_flipsIsLogDiscrepancy_of_isLogDiscrepancy hD'
+  let ν : MMP.Flips.ProperDivisorOver k (U.ι ≫ sX) := ⟨D', hD'.2.1⟩
+  set BU := MMP.Mori.inverseTransformDivisor U.ι B with hBUdef
+  have hBU : ∀ W, BU.coeff W = B.coeff (OpenWeilRestriction.primeDivisorMap U.ι W) := fun W => by
+    rw [hBUdef, MMP.Mori.inverseTransformDivisor_ι_eq_restrictOpen (U := U)]
+    rfl
+  let S : Divisor U := MMP.Intersection.reducedDivisorOf BU.support
+  have hSsupp : S.support = BU.support := MMP.Intersection.support_reducedDivisorOf _
+  have hSsnc : MMP.Flips.IsSNCDivisor (U.ι ≫ sX) S := by
+    have h := hsnc.of_support_subset (D' := S) hSsupp.le
+    refine ⟨fun E => ?_, h.1, fun p _ => h.2 p⟩
+    rw [MMP.Intersection.coeff_reducedDivisorOf]
+    split_ifs <;> simp
+  have hBS : ∀ P, (QDivisor.toRDivisor BU).coeff P ≠ 0 → P ∈ S.support := fun P hP => by
+    rw [hSsupp, Finsupp.mem_support_iff]
+    rw [QDivisor.coeff_toRDivisor] at hP
+    exact fun h0 => hP (by rw [DivisorWithCoeffs.coeff_apply, h0, Rat.cast_zero])
+  have hB1U : ∀ P ∈ S.support, (QDivisor.toRDivisor BU).coeff P ≤ 1 := fun P _ => by
+    rw [QDivisor.coeff_toRDivisor, hBU]
+    exact_mod_cast hB1 _
+  have hcod := codimension_center_le_card_of_isLogDiscrepancy_eq_zero (U.ι ≫ sX) inferInstance
+    hsm hSsnc hBS hB1U ν hFl
+  -- the centre of `ν` has codimension at least two
+  have hcen : ν.center = D'.center := IrreducibleCloseds.ext <| by
+    change _ = closure _
+    exact ν.isClosed_image_support.closure_eq.symm
+  have h2 : (2 : ℕ∞) ≤ codimension ν.center := by
+    rw [hcen, MMP.Positivity.DivisorOver.codimension_center,
+      ← coheight_eq_of_isOpenImmersion U.ι]
+    change 2 ≤ Order.coheight (U.ι (D'.f D'.E.genericPoint))
+    rw [hD'p, hcoh]
+  have hcard : 1 < (S.support.filter fun P =>
+      (ν.center : Set U) ⊆ P.support ∧ (QDivisor.toRDivisor BU).coeff P = 1).card := by
+    have := h2.trans hcod
+    exact_mod_cast this
+  obtain ⟨W₁, hW₁, W₂, hW₂, hne⟩ := Finset.one_lt_card.mp hcard
+  rw [Finset.mem_filter] at hW₁ hW₂
+  have hmem : D'.f D'.E.genericPoint ∈ (ν.center : Set U) :=
+    ⟨D'.E.genericPoint, by
+      rw [AlgebraicGeometry.PrimeDivisor.support_eq_closure]; exact subset_closure rfl, rfl⟩
+  have hcoeff : ∀ W, (QDivisor.toRDivisor BU).coeff W = 1 →
+      B.coeff (OpenWeilRestriction.primeDivisorMap U.ι W) = 1 := fun W h => by
+    rw [QDivisor.coeff_toRDivisor, hBU] at h
+    exact_mod_cast h
+  have hsupp : ∀ W : MMP.Mori.PrimeDivisor U, (ν.center : Set U) ⊆ W.support →
+      D.f D.E.genericPoint ∈ (OpenWeilRestriction.primeDivisorMap U.ι W).support := fun W h => by
+    rw [← hD'p]
+    exact (MMP.Threefold.Mori.OpenRestriction.mem_support_primeDivisorMap_iff U.ι W _).mpr (h hmem)
+  refine ⟨_, _, fun h => hne (OpenWeilRestriction.primeDivisorMap_injective U.ι h),
+    hcoeff _ hW₁.2.2, hcoeff _ hW₂.2.2, hsupp _ hW₁.2.1, hsupp _ hW₂.2.1, fun Q hQ hpQ => ?_⟩
+  -- at most two components of `B|_U` pass through the centre `p'` of `D'` on the surface `U`
+  set p' := D'.f D'.E.genericPoint with hp'
+  have hcoh' : Order.coheight p' = 2 := by
+    rw [← coheight_eq_of_isOpenImmersion U.ι]
+    change Order.coheight (U.ι p') = 2
+    rw [hp', hD'p, hcoh]
+  obtain ⟨nn, z, jj, hz, hj, -⟩ := hsnc.2 p'
+  have hnn : nn = 2 := by
+    have h := hz.2
+    rw [ringKrullDim_stalk_eq_coheight, hcoh'] at h
+    exact_mod_cast h.symm
+  subst hnn
+  obtain ⟨W, rfl⟩ := MMP.Threefold.Mori.OpenRestriction.exists_primeDivisorMap_eq_of_mem_support
+    U.ι Q p' (by rwa [hp', hD'p])
+  have hpW : p' ∈ W.support :=
+    (MMP.Threefold.Mori.OpenRestriction.mem_support_primeDivisorMap_iff U.ι W p').mp
+      (by rwa [hp', hD'p])
+  have hmemBU : ∀ W' : MMP.Mori.PrimeDivisor U, BU.coeff W' ≠ 0 → W' ∈ BU.support :=
+    fun W' h => Finsupp.mem_support_iff.mpr (by rwa [DivisorWithCoeffs.coeff_apply] at h)
+  have hWs : W ∈ BU.support := hmemBU W (by rwa [hBU])
+  have hW₁s : W₁ ∈ BU.support := hSsupp ▸ hW₁.1
+  have hW₂s : W₂ ∈ BU.support := hSsupp ▸ hW₂.1
+  by_contra hQ'
+  rw [not_or] at hQ'
+  have h1 : W ≠ W₁ := fun h => hQ'.1 (by rw [h])
+  have h2 : W ≠ W₂ := fun h => hQ'.2 (by rw [h])
+  have d₁₂ : jj ⟨W₁, hW₁s, hW₁.2.1 hmem⟩ ≠ jj ⟨W₂, hW₂s, hW₂.2.1 hmem⟩ :=
+    fun h => hne (congrArg Subtype.val (hj h))
+  have d₁ : jj ⟨W, hWs, hpW⟩ ≠ jj ⟨W₁, hW₁s, hW₁.2.1 hmem⟩ :=
+    fun h => h1 (congrArg Subtype.val (hj h))
+  have d₂ : jj ⟨W, hWs, hpW⟩ ≠ jj ⟨W₂, hW₂s, hW₂.2.1 hmem⟩ :=
+    fun h => h2 (congrArg Subtype.val (hj h))
+  have l₁ := (jj ⟨W₁, hW₁s, hW₁.2.1 hmem⟩).isLt
+  have l₂ := (jj ⟨W₂, hW₂s, hW₂.2.1 hmem⟩).isLt
+  have l := (jj ⟨W, hWs, hpW⟩).isLt
+  rw [Ne, Fin.ext_iff] at d₁₂ d₁ d₂
+  omega
+
+/-- **Crepant birational maps preserve log pluricanonical sections.** Let
+`σ = φ^* : k(X') ≅ k(X)` be a crepant birational map of pairs `(X, B) ⇢ (X', B')` of dimension
+`n`, with `m(K_{X'} + B')` Cartier. Then `σ^*` carries `H⁰(X', m(K_{X'} + B'))` into
+`H⁰(X, m(K_X + B))`: along a prime divisor `Γ` of `X`, the valuation `v_Γ ∘ σ` is a divisor over
+`X'` of discrepancy `-b_Γ`, and a section of `m(K_{X'} + B')` has order at least `-⌊m b_Γ⌋`
+along it (`MMP.Fourfold.ordPullback_add_floor_nonneg`). -/
+theorem pluriformPullback_mem_logPluricanonicalSections_of_isCrepantBirationalMap
+    {k : Type} [Field k] [IsAlgClosed k] [CharZero k] {X X' : Scheme.{0}}
+    [IsIntegral X] [IsLocallyNoetherian X] [IsNormal X]
+    [IsIntegral X'] [IsLocallyNoetherian X'] [IsNormal X']
+    {sX : X ⟶ Spec (.of k)} {sX' : X' ⟶ Spec (.of k)} {n : ℕ} {B : QDivisor X}
+    {B' : QDivisor X'} (hP : MMP.Mori.IsPair sX B) (hn : topologicalKrullDim X = n)
+    (hX' : IsNormalVariety k sX') {K' : Divisor X'} (hK' : K'.IsCanonicalDivisor sX' n)
+    {m : ℕ} (hm : 0 < m) (hmD : ((m : ℤ) • (Divisor.toQDivisor K' + B')).IsCartierDivisor)
+    {σ : FunctionFieldEquiv sX sX'} (hσ : IsCrepantBirationalMap sX sX' B B' σ)
+    {τ : RationalPluriForms sX' n m} (hτ : τ ∈ logPluricanonicalSections sX' n m B') :
+    pluriformPullback sX sX' σ.toHom n m τ ∈ logPluricanonicalSections sX n m B := by
+  classical
+  obtain ⟨hX, n₀, K, hK, -⟩ := id hP
+  have hn₀ : n₀ = n := by
+    have := hK.topologicalKrullDim_eq.symm.trans hn
+    exact_mod_cast this
+  subst hn₀
+  have hn' := hK'.topologicalKrullDim_eq
+  have : LocallyOfFiniteType sX := hX.1.toLocallyOfFiniteType
+  by_cases hτne : τ = 0
+  · rw [hτne, map_zero]; exact zero_mem _
+  rw [mem_logPluricanonicalSections, mem_pluricanonicalSections_of_ne_bot top_ne_bot]
+  intro Γ _ _
+  set DΓ := DivisorOver.ofPrimeDivisor k hX Γ
+  obtain ⟨c, hc⟩ := MMP.Positivity.IsPair.exists_isDiscrepancy hP hK DΓ
+  have hc' : c = -B.coeff Γ := hc.eq_neg_coeff_of_ofPrimeDivisor hX
+  have hlog := MMP.Threefold.Bridges.isLogDiscrepancy_one_add_of_isDiscrepancy hc
+    (show IsProper (𝟙 X) by infer_instance)
+  obtain ⟨n', D, hDv, hDlog⟩ := (hσ DΓ.valuation (1 + c)).mp ⟨n₀, DΓ, rfl, hlog⟩
+  have hnn : n' = n₀ := by
+    have := (MMP.Threefold.Bridges.IsLogDiscrepancy.topologicalKrullDim_eq hDlog).symm.trans hn'
+    exact_mod_cast this
+  subst hnn
+  have := D.isIntegral
+  have := D.isNormal
+  have := D.isLocallyNoetherian
+  have := D.isDominant
+  have hv : ∀ g : X'.functionField, D.valuation g = Γ.divisorialValuation ((σ.toHom) g) := by
+    intro g
+    rw [hDv]
+    change Γ.divisorialValuation (functionFieldMap (𝟙 X) _) = _
+    rw [functionFieldMap_id_apply]
+    rfl
+  rw [ordForm_pluriformPullback_eq_ordPullback hX hX' hn' σ Γ D hv τ,
+    DivisorWithCoeffs.coeff_roundDown, DivisorWithCoeffs.coeff_smul]
+  have hP' : MMP.Mori.IsPair sX' B' := ⟨hX', n', K', hK', ⟨m, by exact_mod_cast hm.ne', hmD⟩⟩
+  obtain ⟨a, ha⟩ := MMP.Positivity.IsPair.exists_isDiscrepancy hP' hK' D
+  have h1 := MMP.Threefold.Bridges.eq_one_add_of_isDiscrepancy_of_isLogDiscrepancy ha hDlog
+  have hac : a = -B.coeff Γ := by rw [← hc']; exact_mod_cast (by linarith : (a : ℝ) = c)
+  exact ordPullback_add_floor_nonneg hX' hK' hm hmD D hτ hτne (hac ▸ ha)
+
+open exteriorPower in
+/-- **Logarithmic differentials at a zero or a pole.** Let `C` be a normal curve over an
+algebraically closed field of characteristic zero, `Q ∈ C` and `z ∈ k(C)^×` with
+`e = ord_Q z ≠ 0`. For a uniformizer `t` at `Q`, `dz/z = f · dt/t` with `f` a unit at `Q`: writing
+`z = u t^e`, `f = e + t u'/u`. -/
+theorem exists_ιMulti_dlog_eq_smul_of_ord_ne_zero {k : Type} [Field k] [IsAlgClosed k]
+    [CharZero k] {C : Scheme.{0}} {sC : C ⟶ Spec (.of k)} [IsIntegral C]
+    [IsLocallyNoetherian C] [IsNormal C] (hC : IsNormalVariety k sC)
+    (hdim : topologicalKrullDim C = 1) (Q : MMP.Mori.PrimeDivisor C)
+    {z : C.functionField} (hz0 : z ≠ 0) (he : C.ord z Q.genericPoint ≠ 0) :
+    letI := functionFieldAlgebra sC
+    ∃ t f : C.functionField, C.ord t Q.genericPoint = 1 ∧ f ≠ 0 ∧ C.ord f Q.genericPoint = 0 ∧
+      ιMulti C.functionField 1 ![z⁻¹ • KaehlerDifferential.D k C.functionField z] =
+        f • ιMulti C.functionField 1 ![t⁻¹ • KaehlerDifferential.D k C.functionField t] := by
+  classical
+  letI := functionFieldAlgebra sC
+  haveI : LocallyOfFiniteType sC := hC.1.toLocallyOfFiniteType
+  haveI : PerfectField k := PerfectField.ofCharZero
+  have hd1 : topologicalKrullDim C = ((1 : ℕ) : WithBot ℕ∞) := by exact_mod_cast hdim
+  set e := C.ord z Q.genericPoint with he_def
+  -- a uniformizer at `q`
+  obtain ⟨t, htQ⟩ : ∃ t : C.functionField, C.ord t Q.genericPoint = 1 := by
+    have := Q.isDiscreteValuationRing_localRing
+    obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible Q.localRing
+    have hne : algebraMap Q.localRing C.functionField ϖ ≠ 0 :=
+      (map_ne_zero_iff _ (IsFractionRing.injective _ _)).2 hϖ.ne_zero
+    refine ⟨algebraMap Q.localRing C.functionField ϖ, ?_⟩
+    have h := Q.divisorialValuation_algebraMap_of_irreducible hϖ
+    rw [Q.divisorialValuation_eq_exp_neg_ord hne] at h
+    have := WithZero.exp_injective h
+    omega
+  have ht0 : t ≠ 0 := by rintro rfl; simp at htQ
+  set u := z * t ^ (-e) with hu
+  have hu0 : u ≠ 0 := mul_ne_zero hz0 (zpow_ne_zero _ ht0)
+  have huo : C.ord u Q.genericPoint = 0 := by
+    rw [hu, Scheme.ord_mul hz0 (zpow_ne_zero _ ht0), ord_zpow _ ht0, htQ, ← he_def]
+    ring
+  have hzu : z = t ^ e * u ^ (1 : ℤ) := by
+    rw [zpow_one, hu, mul_comm z, ← mul_assoc, ← zpow_add₀ ht0, add_neg_cancel, zpow_zero,
+      one_mul]
+  have hvec : ∀ v : Ω[C.functionField⁄k], (![v] : Fin 1 → Ω[C.functionField⁄k]) = fun _ => v :=
+    fun v => funext fun i => by fin_cases i; rfl
+  have hadd : ∀ v w : Ω[C.functionField⁄k], ιMulti C.functionField 1 ![v + w] =
+      ιMulti C.functionField 1 ![v] + ιMulti C.functionField 1 ![w] := by
+    intro v w
+    have e' : ∀ x : Ω[C.functionField⁄k],
+        (![x] : Fin 1 → Ω[C.functionField⁄k]) = Function.update ![v] 0 x := by
+      intro x; funext i; fin_cases i; simp
+    rw [e' (v + w), AlternatingMap.map_update_add, ← e', ← e']
+  set η := ιMulti C.functionField 1 ![t⁻¹ • KaehlerDifferential.D k C.functionField t] with hη
+  have hdl : Flips.dlogPow sC t 1 = PiTensorProduct.tprod C.functionField (fun _ : Fin 1 => η) := by
+    unfold Flips.dlogPow
+    rw [hη, ιMulti_one_smul, hvec]
+  obtain ⟨hD1, hDo1⟩ := Flips.ordForm_dlogPow_one_of_ord_eq_one hC hdim Q t htQ
+  have hη0 : η ≠ 0 := by
+    intro h0
+    have h2 : (PiTensorProduct.tprod C.functionField fun _ : Fin 1 => η) = 0 := by
+      rw [h0]; exact MultilinearMap.map_coord_zero _ (0 : Fin 1) rfl
+    exact hD1 (hdl.trans h2)
+  obtain ⟨g, hg⟩ : ∃ g : C.functionField,
+      g • η = ιMulti C.functionField 1 ![KaehlerDifferential.D k C.functionField u] := by
+    have hspan := span_singleton_topForms_eq_top (sX := sC) hd1 hη0
+    have hmem : ιMulti C.functionField 1 ![KaehlerDifferential.D k C.functionField u] ∈
+        Submodule.span C.functionField {η} := by
+      rw [hspan]; trivial
+    exact Submodule.mem_span_singleton.1 hmem
+  have hg1 : g ≠ 0 → 1 ≤ C.ord g Q.genericPoint := by
+    intro hg0
+    have h' : g • Flips.dlogPow sC t 1 = (PiTensorProduct.tprod C.functionField fun _ : Fin 1 =>
+        ιMulti C.functionField 1 ![KaehlerDifferential.D k C.functionField u] :
+          RationalPluriForms sC 1 (1 : ℕ)) := by
+      rw [← hg, show (fun _ : Fin 1 => g • η) = fun i => (fun _ : Fin 1 => g) i •
+        (fun _ : Fin 1 => η) i from rfl, MultilinearMap.map_smul_univ, Finset.prod_const,
+        Finset.card_univ, Fintype.card_fin, pow_one, hdl]
+      rfl
+    have h0 := Flips.zero_le_ordForm_d hC hdim Q u huo.ge _ (by rw [h', hvec])
+      (smul_ne_zero hg0 hD1)
+    rw [Q.ordForm_smul_of_topologicalKrullDim_eq hd1 hg0 hD1, hDo1] at h0
+    push_cast at h0
+    omega
+  have hdz : ιMulti C.functionField 1 ![z⁻¹ • KaehlerDifferential.D k C.functionField z] =
+      ((e : C.functionField) + u⁻¹ * g) • η := by
+    have h1 : z⁻¹ • KaehlerDifferential.D k C.functionField z =
+        (e : C.functionField) • t⁻¹ • KaehlerDifferential.D k C.functionField t +
+          u⁻¹ • KaehlerDifferential.D k C.functionField u := by
+      have hz' : t ^ e * u ^ (1 : ℤ) ≠ 0 := by rwa [← hzu]
+      rw [hzu, kaehlerD_zpow_mul_zpow ht0 hu0 e 1, smul_smul, inv_mul_cancel₀ hz', one_smul,
+        Int.cast_one, one_smul]
+    rw [h1, hadd, ιMulti_one_smul, ← hη, ιMulti_one_smul, ← hg, smul_smul, ← add_smul]
+  -- the coefficient `e + h` is a unit at `q`
+  set h := u⁻¹ * g with hh
+  have hv : Q.divisorialValuation h < 1 := by
+    by_cases hg0 : g = 0
+    · rw [hh, hg0, mul_zero, map_zero]; exact zero_lt_one
+    have hh0 : h ≠ 0 := mul_ne_zero (inv_ne_zero hu0) hg0
+    rw [Q.divisorialValuation_eq_exp_neg_ord hh0, ← WithZero.exp_zero, WithZero.exp_lt_exp]
+    have := hg1 hg0
+    rw [hh, Scheme.ord_mul (inv_ne_zero hu0) hg0, ← zpow_neg_one, ord_zpow _ hu0, huo]
+    omega
+  have hek : (e : k) ≠ 0 := Int.cast_ne_zero.mpr he
+  have hne' : algebraMap k C.functionField (e : k) ≠ 0 := (map_ne_zero _).mpr hek
+  have hce : C.ord (algebraMap k C.functionField (e : k)) Q.genericPoint = 0 := by
+    letI := stalkAlgebra sC Q.genericPoint
+    haveI := isScalarTower_stalk_functionField sC Q.genericPoint
+    rw [IsScalarTower.algebraMap_apply k Q.localRing C.functionField]
+    exact Q.ord_algebraMap_of_isUnit ((IsUnit.mk0 _ hek).map _)
+  have hve : Q.divisorialValuation (e : C.functionField) = 1 := by
+    rw [← map_intCast (algebraMap k C.functionField) e, Q.divisorialValuation_eq_exp_neg_ord hne',
+      hce, neg_zero, WithZero.exp_zero]
+  have hv1 : Q.divisorialValuation ((e : C.functionField) + h) = 1 := by
+    rw [Valuation.map_add_eq_of_lt_left _ (by rw [hve]; exact hv), hve]
+  have hf0 : (e : C.functionField) + h ≠ 0 := by
+    intro h0; rw [h0, map_zero] at hv1; exact zero_ne_one hv1
+  have hfo : C.ord ((e : C.functionField) + h) Q.genericPoint = 0 := by
+    rw [Q.divisorialValuation_eq_exp_neg_ord hf0, ← WithZero.exp_zero, WithZero.exp_inj] at hv1
+    omega
+  exact ⟨t, (e : C.functionField) + h, htQ, hf0, hfo, hdz⟩
+
+open exteriorPower in
+/-- `(dz/z)^{⊗m}` is the form `MMP.Flips.dlogPow`. -/
+theorem formPow_ιMulti_dlog_eq_dlogPow {k : Type} [Field k] {C : Scheme.{0}}
+    (sC : C ⟶ Spec (.of k)) [IsIntegral C] (z : C.functionField) (m : ℕ) :
+    letI := functionFieldAlgebra sC
+    (formPow (ιMulti C.functionField 1 ![z⁻¹ • KaehlerDifferential.D k C.functionField z]) m :
+      RationalPluriForms sC 1 m) = Flips.dlogPow sC z m := by
+  letI := functionFieldAlgebra sC
+  unfold Flips.dlogPow formPow
+  congr 1
+  funext _
+  rw [ιMulti_one_smul]
+  congr 2
+  funext i
+  fin_cases i
+  rfl
+
+open exteriorPower in
+/-- **`dz/z` has a simple pole at a zero or a pole of `z`.** On a normal curve over an
+algebraically closed field of characteristic zero, `ord_Q(dz/z) = -1` when `ord_Q z ≠ 0`. -/
+theorem ordForm_formPow_dlog_eq_neg_one_of_ord_ne_zero {k : Type} [Field k] [IsAlgClosed k]
+    [CharZero k] {C : Scheme.{0}} {sC : C ⟶ Spec (.of k)} [IsIntegral C]
+    [IsLocallyNoetherian C] [IsNormal C] (hC : IsNormalVariety k sC)
+    (hdim : topologicalKrullDim C = 1) (Q : MMP.Mori.PrimeDivisor C)
+    {z : C.functionField} (hz0 : z ≠ 0) (he : C.ord z Q.genericPoint ≠ 0) :
+    letI := functionFieldAlgebra sC
+    Q.ordForm (show RationalPluriForms sC 1 (1 : ℕ) from formPow (ιMulti C.functionField 1
+      ![z⁻¹ • KaehlerDifferential.D k C.functionField z]) 1) = -1 := by
+  letI := functionFieldAlgebra sC
+  haveI : LocallyOfFiniteType sC := hC.1.toLocallyOfFiniteType
+  haveI : PerfectField k := PerfectField.ofCharZero
+  have hd1 : topologicalKrullDim C = ((1 : ℕ) : WithBot ℕ∞) := by exact_mod_cast hdim
+  obtain ⟨t, f, htQ, hf0, hfo, hdz⟩ := exists_ιMulti_dlog_eq_smul_of_ord_ne_zero hC hdim Q hz0 he
+  obtain ⟨hD1, hDo1⟩ := Flips.ordForm_dlogPow_one_of_ord_eq_one hC hdim Q t htQ
+  have hω : (formPow (ιMulti C.functionField 1
+      ![z⁻¹ • KaehlerDifferential.D k C.functionField z]) 1 : PluriForms k C.functionField 1 1) =
+      f • Flips.dlogPow sC t 1 := by
+    rw [hdz, formPow_smul, pow_one, formPow_ιMulti_dlog_eq_dlogPow]
+    rfl
+  dsimp only
+  rw [hω, Q.ordForm_smul_of_topologicalKrullDim_eq hd1 hf0 hD1, hfo, hDo1]
+  rfl
+
+/-- **A nonconstant function on a smooth proper curve has a zero or a pole.** Over an
+algebraically closed field, a rational function `f ∉ k` on a smooth proper curve has
+`ord_R f ≠ 0` at some point `R`. -/
+theorem exists_ord_ne_zero_of_forall_ne_algebraMap {k : Type} [Field k] [IsAlgClosed k]
+    {C : Scheme.{0}} {sC : C ⟶ Spec (.of k)} [IsIntegral C] [IsLocallyNoetherian C] [IsNormal C]
+    [CompactSpace C] (hC : IsNormalVariety k sC) (hsm : IsSmoothScheme sC) (hp : IsProper sC)
+    (hdim : topologicalKrullDim C = 1) {f : C.functionField} (hf : f ≠ 0)
+    (hfk : letI := functionFieldAlgebra sC; ∀ c : k, f ≠ algebraMap k C.functionField c) :
+    ∃ R : MMP.Mori.PrimeDivisor C, C.ord f R.genericPoint ≠ 0 := by
+  classical
+  letI := functionFieldAlgebra sC
+  haveI : LocallyOfFiniteType sC := hC.1.toLocallyOfFiniteType
+  by_contra hcon
+  push Not at hcon
+  obtain ⟨P⟩ := MMP.Positivity.nonempty_primeDivisor_of_topologicalKrullDim_eq
+    (show topologicalKrullDim C = ((1 : ℕ) : WithBot ℕ∞) by exact_mod_cast hdim) one_ne_zero
+  have hPc : IsClosed ({P.genericPoint} : Set C) :=
+    Stacks.AlgebraicGeometry.AmpleDimensionOne.isClosed_singleton_of_ne_genericPoint C hdim
+      fun h => by
+        have h1 := P.coheight_genericPoint
+        rw [h, Order.coheight_eq_zero.mpr fun b _ => (genericPoint_spec C).specializes trivial]
+          at h1
+        exact zero_ne_one h1
+  letI := stalkAlgebra sC P.genericPoint
+  haveI := isScalarTower_stalk_functionField sC P.genericPoint
+  haveI := MMP.Flips.ResolutionInputs.finite_residueField_of_isClosed sC P.genericPoint hPc
+  have hcoh : Order.coheight P.genericPoint = 1 := P.coheight_genericPoint
+  obtain ⟨b, hb⟩ := (Scheme.mem_range_algebraMap_stalk_iff_zero_le_ord hcoh hf).mpr
+    (hcon P).ge
+  obtain ⟨c, hc⟩ := (IsAlgClosed.algebraMap_bijective_of_isIntegral (k := k)
+    (K := IsLocalRing.ResidueField (C.presheaf.stalk P.genericPoint))).2 (IsLocalRing.residue _ b)
+  have hmem : b - algebraMap k _ c ∈ IsLocalRing.maximalIdeal (C.presheaf.stalk P.genericPoint) := by
+    rw [← IsLocalRing.residue_eq_zero_iff, map_sub, ← hc, IsScalarTower.algebraMap_apply k
+      (C.presheaf.stalk P.genericPoint) (IsLocalRing.ResidueField _),
+      IsLocalRing.ResidueField.algebraMap_eq, sub_self]
+  have hg : f - algebraMap k C.functionField c ≠ 0 := sub_ne_zero.mpr (hfk c)
+  have hgb : algebraMap _ C.functionField (b - algebraMap k _ c) =
+      f - algebraMap k C.functionField c := by
+    rw [map_sub, hb, ← IsScalarTower.algebraMap_apply]
+  -- `f - c` vanishes at `P` and is regular everywhere
+  have hP1 : 1 ≤ C.ord (f - algebraMap k C.functionField c) P.genericPoint := by
+    have h1 := (P.divisorialValuation_algebraMap_lt_one_iff _).mpr hmem
+    rw [hgb, P.divisorialValuation_eq_exp_neg_ord hg, ← WithZero.exp_zero,
+      WithZero.exp_lt_exp] at h1
+    omega
+  have h0 : ∀ R : MMP.Mori.PrimeDivisor C,
+      0 ≤ C.ord (f - algebraMap k C.functionField c) R.genericPoint := by
+    intro R
+    letI := stalkAlgebra sC R.genericPoint
+    haveI := isScalarTower_stalk_functionField sC R.genericPoint
+    have hf1 : R.divisorialValuation f ≤ 1 := by
+      rw [R.divisorialValuation_eq_exp_neg_ord hf, hcon R, neg_zero, WithZero.exp_zero]
+    have hc1 : R.divisorialValuation (algebraMap k C.functionField c) ≤ 1 := by
+      rw [IsScalarTower.algebraMap_apply k (C.presheaf.stalk R.genericPoint) C.functionField]
+      exact (R.divisorialValuation_le_one_iff _).2 ⟨_, rfl⟩
+    have h1 := (R.divisorialValuation.map_sub _ _).trans (max_le hf1 hc1)
+    rw [R.divisorialValuation_eq_exp_neg_ord hg, ← WithZero.exp_zero, WithZero.exp_le_exp] at h1
+    omega
+  -- the degree of `div(f - c)` vanishes
+  obtain ⟨φ, hφ⟩ := MMP.Positivity.exists_units_of_ne_zero hg
+  have hsum := MMP.Flips.sum_principalDivisor_eq_zero hC hsm hp hdim φ
+  have hcoef : ∀ R : MMP.Mori.PrimeDivisor C, (MMP.Mori.principalDivisor φ) R =
+      C.ord (f - algebraMap k C.functionField c) R.genericPoint := fun R => by
+    change DivisorWithCoeffs.coeff (MMP.Mori.principalDivisor φ) R = _
+    rw [coeff_principalDivisor, hφ]
+  have hmemP : P ∈ (MMP.Mori.principalDivisor φ).support := by
+    rw [Finsupp.mem_support_iff, hcoef]; omega
+  have hle : (MMP.Mori.principalDivisor φ) P ≤ (MMP.Mori.principalDivisor φ).sum
+      (fun _ a => a) :=
+    Finset.single_le_sum (f := fun R => (MMP.Mori.principalDivisor φ) R)
+      (fun R _ => by rw [hcoef]; exact h0 R) hmemP
+  rw [hsum, hcoef] at hle
+  omega
+
+/-- **Adjunction to a point of a curve.** On a normal curve `C` over an algebraically closed field
+of characteristic zero with a pair structure `(C, B_C)`, every point `Q` with coefficient one in
+`B_C` is reached by an adjunction step `S ⟶ C` from an integral zero-dimensional `S`. -/
+theorem exists_isAdjunctionStep_of_coeff_eq_one_of_topologicalKrullDim_eq_one {k : Type}
+    [Field k] [IsAlgClosed k] [CharZero k] {C : Scheme.{0}} {sC : C ⟶ Spec (.of k)}
+    [IsIntegral C] [IsLocallyNoetherian C] [IsNormal C] {BC : QDivisor C}
+    (hC : MMP.Mori.IsPair sC BC) (hdim : topologicalKrullDim C = 1)
+    (Q : MMP.Mori.PrimeDivisor C) (hQ : BC.coeff Q = 1) :
+    ∃ (S : Scheme.{0}) (jq : S ⟶ C) (Bq : QDivisor S) (_ : IsAdjunctionStep sC BC jq Bq)
+      (_ : IsIntegral S), topologicalKrullDim S = (0 : ℕ) ∧
+        jq (genericPoint S) = Q.genericPoint := by
+  have := Q.integral
+  obtain ⟨hCv, N, K, hK, hKq⟩ := hC
+  have : AlgebraicGeometry.IsVariety k sC := hCv.1
+  have : LocallyOfFiniteType sC := hCv.1.toLocallyOfFiniteType
+  obtain rfl : N = 0 + 1 := by
+    have h := hK.topologicalKrullDim_eq.symm.trans hdim
+    exact_mod_cast h
+  have hj : Set.range Q.idealSheaf.subschemeι.base = (Q.support : Set C) :=
+    Scheme.IdealSheafData.range_subschemeι Q.idealSheaf
+  have hdimS : topologicalKrullDim Q.idealSheaf.subscheme = (0 : ℕ) :=
+    MMP.Fourfold.topologicalKrullDim_eq_of_range_eq_support sC (by rw [hdim]; rfl)
+      Q.idealSheaf.subschemeι Q hj
+  have hvar : AlgebraicGeometry.IsVariety k (Q.idealSheaf.subschemeι ≫ sC) :=
+    (MMP.Mori.isVariety_iff k _).mpr ⟨inferInstance, inferInstance, inferInstance, inferInstance⟩
+  have hSv : IsNormalVariety k (Q.idealSheaf.subschemeι ≫ sC) :=
+    ⟨hvar, isNormal_of_topologicalKrullDim_eq_zero (by exact_mod_cast hdimS)⟩
+  obtain ⟨Bq, hBq⟩ := exists_isAdjunctionStep_of_isQCartier hCv hK hKq Q hQ
+    Q.idealSheaf.subschemeι hj hSv
+  have hg : Q.idealSheaf.subschemeι (genericPoint Q.idealSheaf.subscheme) = Q.genericPoint := by
+    have h1 := (genericPoint_spec Q.idealSheaf.subscheme).image
+      Q.idealSheaf.subschemeι.base.hom.continuous
+    rw [Set.image_univ, Q.idealSheaf.subschemeι.isClosedEmbedding.isClosed_range.closure_eq, hj,
+      AlgebraicGeometry.PrimeDivisor.support_eq_closure] at h1
+    exact h1.eq isGenericPoint_closure
+  exact ⟨_, _, Bq, hBq, inferInstance, hdimS, hg⟩
+
+open exteriorPower in
+/-- **Residues of `(dz/z)^{⊗m}` at points of a curve.** Let `C` be a normal curve over an
+algebraically closed field of characteristic zero, `q ∈ C` reached by an adjunction step
+`S ⟶ C`, and `z ∈ k(C)^×` with `e = ord_q z ≠ 0`. Then `(dz/z)^{⊗m}` has a nonzero residue at
+`q` (it is `e^m`). -/
+theorem exists_isPoincareResidue_formPow_dlog_ne_zero {k : Type} [Field k] [IsAlgClosed k]
+    [CharZero k] {C S : Scheme.{0}} {sC : C ⟶ Spec (.of k)} [IsIntegral C]
+    [IsLocallyNoetherian C] [IsNormal C] [IsIntegral S] (hC : IsNormalVariety k sC)
+    (hdim : topologicalKrullDim C = 1) {jq : S ⟶ C} {BC : QDivisor C} {BS : QDivisor S}
+    (hq : IsAdjunctionStep sC BC jq BS) (hS : topologicalKrullDim S = (0 : ℕ))
+    {z : C.functionField} (hz0 : z ≠ 0) (he : C.ord z (jq (genericPoint S)) ≠ 0) (m : ℕ) :
+    letI := functionFieldAlgebra sC
+    ∃ r : RationalPluriForms (jq ≫ sC) 0 m, r ≠ 0 ∧
+      IsPoincareResidue sC jq 0 m
+        (formPow (ιMulti C.functionField 1
+          ![z⁻¹ • KaehlerDifferential.D k C.functionField z]) m) r := by
+  classical
+  letI := functionFieldAlgebra sC
+  letI := functionFieldAlgebra (jq ≫ sC)
+  haveI : LocallyOfFiniteType sC := hC.1.toLocallyOfFiniteType
+  haveI : PerfectField k := PerfectField.ofCharZero
+  haveI : LocallyOfFiniteType (jq ≫ sC) := hq.1.1.toLocallyOfFiniteType
+  obtain ⟨Q, hQ, -⟩ := hq.exists_primeDivisor
+  have hcoh : Order.coheight (jq (genericPoint S)) = 1 := hQ ▸ Q.coheight_genericPoint
+  have hd1 : topologicalKrullDim C = ((1 : ℕ) : WithBot ℕ∞) := by exact_mod_cast hdim
+  obtain ⟨t, f, htQ, hf0, hfo, hdz⟩ :=
+    exists_ιMulti_dlog_eq_smul_of_ord_ne_zero hC hdim Q hz0 (hQ ▸ he)
+  have ht0 : t ≠ 0 := by rintro rfl; simp at htQ
+  have ht : C.ord t (jq (genericPoint S)) = 1 := by rwa [hQ]
+  set η := ιMulti C.functionField 1 ![t⁻¹ • KaehlerDifferential.D k C.functionField t] with hη
+  replace hfo : C.ord f (jq (genericPoint S)) = 0 := by rwa [hQ]
+  obtain ⟨fs, hfs⟩ := (Scheme.mem_range_algebraMap_stalk_iff_zero_le_ord hcoh hf0).mpr hfo.ge
+  obtain ⟨fi, hfi⟩ := (Scheme.mem_range_algebraMap_stalk_iff_zero_le_ord hcoh
+    (inv_ne_zero hf0)).mpr (by rw [← zpow_neg_one, ord_zpow _ hf0, hfo, mul_zero])
+  have hff : fs * fi = 1 := IsFractionRing.injective _ C.functionField <| by
+    rw [map_mul, hfs, hfi, map_one, mul_inv_cancel₀ hf0]
+  have hfu : IsUnit fs := ⟨⟨fs, fi, hff, by rw [mul_comm, hff]⟩, rfl⟩
+  obtain ⟨ts, hts⟩ := (Scheme.mem_range_algebraMap_stalk_iff_zero_le_ord hcoh ht0).mpr
+    (by rw [ht]; exact zero_le_one)
+  have hpow : ∀ (c : C.functionField) (ω : ⋀[C.functionField]^1 Ω[C.functionField⁄k]),
+      (formPow (c • ω) m : PluriForms k C.functionField 1 m) = c ^ m • formPow ω m := by
+    intro c ω
+    unfold formPow
+    rw [show (fun _ : Fin m => c • ω) = fun i : Fin m => (fun _ => c) i • (fun _ => ω) i from rfl,
+      MultilinearMap.map_smul_univ, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
+    rfl
+  set ρ0 := ιMulti S.functionField 0 (fun i : Fin 0 => KaehlerDifferential.D k S.functionField
+    ((jq.stalkMap (genericPoint S)).hom ((Fin.elim0 i : C.presheaf.stalk (jq (genericPoint S))))))
+    with hρ0d
+  refine ⟨((jq.stalkMap (genericPoint S)).hom (fs ^ m)) •
+      (PiTensorProduct.tprod S.functionField fun _ : Fin m => ρ0 :
+        RationalPluriForms (jq ≫ sC) 0 m), ?_, ts, fs ^ m, Fin.elim0,
+      by rw [hts]; exact ht, ?_, rfl⟩
+  · refine smul_ne_zero ((hfu.pow m).map (jq.stalkMap (genericPoint S)).hom).ne_zero ?_
+    have hρ0 : ρ0 ≠ 0 := by
+      intro h0
+      have h1 := congrArg (fun w : ⋀[S.functionField]^0 Ω[S.functionField⁄k] =>
+        (w : ExteriorAlgebra S.functionField Ω[S.functionField⁄k])) h0
+      simp only [hρ0d, exteriorPower.ιMulti_apply_coe, ExteriorAlgebra.ιMulti_zero_apply,
+        ZeroMemClass.coe_zero] at h1
+      exact one_ne_zero h1
+    obtain ⟨Bb⟩ := MMP.Fourfold.exists_basis_topForms (sX := jq ≫ sC) hS
+    let b := basisOfSpanSingleton (MMP.Spreading.span_singleton_eq_top_of_basis_unit Bb hρ0) hρ0
+    have hb : b () = ρ0 := basisOfSpanSingleton_apply _ _ _
+    change (formPow ρ0 m : RationalPluriForms (jq ≫ sC) 0 m) ≠ 0
+    rw [← hb, ← ZTensorPower.basis_natCast]
+    exact (ZTensorPower.basis b m).ne_zero ()
+  · have hcons : (Fin.cons (KaehlerDifferential.D k C.functionField t)
+        (fun i : Fin 0 => KaehlerDifferential.D k C.functionField
+          (algebraMap _ C.functionField (Fin.elim0 i : C.presheaf.stalk (jq (genericPoint S))))) :
+          Fin 1 → Ω[C.functionField⁄k]) = ![KaehlerDifferential.D k C.functionField t] :=
+      funext fun i => by fin_cases i; rfl
+    have hη' : t⁻¹ • ιMulti C.functionField (0 + 1) ![KaehlerDifferential.D k C.functionField t] =
+        η := by
+      rw [hη, ιMulti_one_smul]
+    rw [hts, map_pow, hfs, hdz, hcons, hη', hpow]
+    rfl
+
+section WeightedMonomialResidue
+
+open IsLocalRing
+open scoped WithZero
+
+variable {R : Type*} [CommRing R]
+
+/-- Weighted monomial ideals do not depend on the indexing of the variables. -/
+theorem weightedMonomialIdeal_comp_equiv {ι ι' : Type*} [Fintype ι] [Fintype ι'] (z : ι → R)
+    (α : ι → ℕ) (e : ι' ≃ ι) (m : ℕ) :
+    weightedMonomialIdeal (z ∘ e) (α ∘ e) m = weightedMonomialIdeal z α m := by
+  unfold weightedMonomialIdeal
+  congr 1
+  ext r
+  constructor
+  · rintro ⟨β, hβ, rfl⟩
+    refine ⟨β ∘ e.symm, ?_, ?_⟩
+    · rw [← Equiv.sum_comp e]
+      simpa [Function.comp] using hβ
+    · rw [← Equiv.prod_comp e]
+      simp [Function.comp]
+  · rintro ⟨β, hβ, rfl⟩
+    refine ⟨β ∘ e, ?_, (Equiv.prod_comp e (fun i => z i ^ β i)).symm⟩
+    have := Equiv.sum_comp e (fun i => α i * β i)
+    simp only [Function.comp] at this ⊢
+    rwa [this]
+
+/-- The image of a weighted monomial ideal under a ring homomorphism. -/
+theorem weightedMonomialIdeal_map {S F : Type*} [CommRing S] [FunLike F R S]
+    [RingHomClass F R S] {ι : Type*} [Fintype ι] (φ : F) (z : ι → R) (α : ι → ℕ) (m : ℕ) :
+    Ideal.map φ (weightedMonomialIdeal z α m) = weightedMonomialIdeal (φ ∘ z) α m := by
+  unfold weightedMonomialIdeal
+  rw [Ideal.map_span]
+  congr 1
+  ext r
+  constructor
+  · rintro ⟨_, ⟨β, hβ, rfl⟩, rfl⟩
+    exact ⟨β, hβ, by simp [map_prod, map_pow]⟩
+  · rintro ⟨β, hβ, rfl⟩
+    exact ⟨_, ⟨β, hβ, rfl⟩, by simp [map_prod, map_pow]⟩
+
+variable {K : Type*} [Field K] [Algebra R K]
+
+/-- Elements of the weighted monomial ideal of degree `N` have valuation at most `exp(-N)`. -/
+theorem valuation_le_of_mem_weightedMonomialIdeal (v : Valuation K ℤᵐ⁰)
+    (hvR : ∀ r : R, v (algebraMap R K r) ≤ 1) {x y : R} {a b : ℕ}
+    (hvx : v (algebraMap R K x) = WithZero.exp (-(a : ℤ)))
+    (hvy : v (algebraMap R K y) = WithZero.exp (-(b : ℤ))) {N : ℕ} {f : R}
+    (hf : f ∈ weightedMonomialIdeal ![x, y] ![a, b] N) :
+    v (algebraMap R K f) ≤ WithZero.exp (-(N : ℤ)) := by
+  unfold weightedMonomialIdeal at hf
+  change f ∈ Submodule.span R _ at hf
+  induction hf using Submodule.span_induction with
+  | mem r hr =>
+    obtain ⟨β, hβ, rfl⟩ := hr
+    simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one] at hβ
+    rw [Fin.prod_univ_two, map_mul, map_pow, map_pow, map_mul, map_pow, map_pow]
+    simp only [Matrix.cons_val_zero, Matrix.cons_val_one]
+    rw [hvx, hvy, ← WithZero.exp_nsmul, ← WithZero.exp_nsmul, ← WithZero.exp_add,
+      WithZero.exp_le_exp]
+    have : (N : ℤ) ≤ a * β 0 + b * β 1 := by exact_mod_cast hβ
+    simp only [nsmul_eq_mul]
+    push_cast
+    linarith
+  | zero => simp
+  | add f g _ _ hf hg => rw [map_add]; exact v.map_add_le hf hg
+  | smul r f _ hf =>
+    rw [smul_eq_mul, map_mul, map_mul]
+    calc v (algebraMap R K r) * v (algebraMap R K f) ≤ 1 * WithZero.exp (-(N : ℤ)) :=
+          mul_le_mul' (hvR r) hf
+      _ = _ := one_mul _
+
+/-- Multiplying by an element of `(x, y)` raises the weighted degree. -/
+theorem mul_mem_weightedMonomialIdeal_succ {x y : R} {a b : ℕ} (ha : 0 < a) (hb : 0 < b)
+    {r : R} (hr : r ∈ Ideal.span {x, y}) {M : ℕ} {f : R}
+    (hf : f ∈ weightedMonomialIdeal ![x, y] ![a, b] M) :
+    r * f ∈ weightedMonomialIdeal ![x, y] ![a, b] (M + 1) := by
+  obtain ⟨s, t, rfl⟩ := Ideal.mem_span_pair.mp hr
+  have hgen : ∀ (i : Fin 2) (g : R), g ∈ weightedMonomialIdeal ![x, y] ![a, b] M →
+      ![x, y] i * g ∈ weightedMonomialIdeal ![x, y] ![a, b] (M + 1) := by
+    intro i g hg
+    unfold weightedMonomialIdeal at hg ⊢
+    change g ∈ Submodule.span R _ at hg
+    induction hg using Submodule.span_induction with
+    | mem r hr =>
+      obtain ⟨β, hβ, rfl⟩ := hr
+      refine Ideal.subset_span ⟨β + Pi.single i 1, ?_, ?_⟩
+      · simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one] at hβ ⊢
+        fin_cases i <;> simp [Pi.single_apply] <;> nlinarith
+      · rw [Fin.prod_univ_two, Fin.prod_univ_two]
+        fin_cases i <;> simp [Pi.single_apply, pow_add] <;> ring
+    | zero => simp
+    | add f g _ _ hf hg => rw [mul_add]; exact add_mem hf hg
+    | smul r f _ hf => rw [smul_eq_mul, mul_left_comm]; exact Ideal.mul_mem_left _ _ hf
+  have h0 := hgen 0 f hf
+  have h1 := hgen 1 f hf
+  simp only [Matrix.cons_val_zero, Matrix.cons_val_one] at h0 h1
+  rw [add_mul, mul_assoc, mul_assoc]
+  exact add_mem (Ideal.mul_mem_left _ _ h0) (Ideal.mul_mem_left _ _ h1)
+
+variable {k : Type*} [Field k] [Algebra k R] [Algebra k K] [IsScalarTower k R K]
+
+/-- **Weighted initial forms.** Let `x, y` generate the maximal ideal of a local `k`-algebra `R`
+with residue field `k`, and let `(a, b)` be positive weights with `ac + bd = 1`. Modulo the
+weighted monomial ideal of degree `M + 1`, every element of degree `M` is a polynomial `G` in
+`x, y` whose image in `K` is `L · u^M`, with `L` a Laurent polynomial in `y^a x^{-b}` and
+`u = x^c y^d`. -/
+theorem exists_eq_mul_zpow_and_sub_mem_weightedMonomialIdeal [IsLocalRing R] {x y : R}
+    (hx0 : algebraMap R K x ≠ 0) (hy0 : algebraMap R K y ≠ 0) {a b : ℕ} {c d : ℤ}
+    (hcd : (a : ℤ) * c + b * d = 1) (ha : 0 < a) (hb : 0 < b)
+    (hres : ∀ r : R, ∃ r₀ : k, r - algebraMap k R r₀ ∈ maximalIdeal R)
+    (hmax : maximalIdeal R ≤ Ideal.span {x, y}) (M : ℕ) {f : R}
+    (hf : f ∈ weightedMonomialIdeal ![x, y] ![a, b] M) :
+    ∃ G : R, ∃ L ∈ Algebra.adjoin k
+        {algebraMap R K y ^ (a : ℤ) * algebraMap R K x ^ (-(b : ℤ)),
+          (algebraMap R K y ^ (a : ℤ) * algebraMap R K x ^ (-(b : ℤ)))⁻¹},
+      algebraMap R K G = L * (algebraMap R K x ^ c * algebraMap R K y ^ d) ^ (M : ℤ) ∧
+      f - G ∈ weightedMonomialIdeal ![x, y] ![a, b] (M + 1) := by
+  set xK := algebraMap R K x
+  set yK := algebraMap R K y
+  set zf := yK ^ (a : ℤ) * xK ^ (-(b : ℤ)) with hzf
+  set u := xK ^ c * yK ^ d with hu
+  set A := Algebra.adjoin k {zf, zf⁻¹}
+  have hzpow : ∀ n : ℤ, zf ^ n ∈ A := by
+    intro n
+    rcases n with n | n
+    · rw [Int.ofNat_eq_coe, zpow_natCast]
+      exact pow_mem (Algebra.subset_adjoin (Set.mem_insert _ _)) n
+    · rw [zpow_negSucc, ← inv_pow]
+      exact pow_mem (Algebra.subset_adjoin (Set.mem_insert_of_mem _ (Set.mem_singleton _))) _
+  have key : ∀ e₁ e₂ : ℕ, xK ^ e₁ * yK ^ e₂ =
+      zf ^ (c * e₂ - d * e₁) * u ^ (((a * e₁ + b * e₂ : ℕ) : ℤ)) := by
+    intro e₁ e₂
+    have h1 : (e₁ : ℤ) = -(b : ℤ) * (c * e₂ - d * e₁) + c * ((a * e₁ + b * e₂ : ℕ) : ℤ) := by
+      push_cast; linear_combination (-(e₁ : ℤ)) * hcd
+    have h2 : (e₂ : ℤ) = (a : ℤ) * (c * e₂ - d * e₁) + d * ((a * e₁ + b * e₂ : ℕ) : ℤ) := by
+      push_cast; linear_combination (-(e₂ : ℤ)) * hcd
+    rw [hzf, hu, mul_zpow, mul_zpow, ← zpow_mul, ← zpow_mul, ← zpow_mul, ← zpow_mul,
+      ← zpow_natCast xK, ← zpow_natCast yK]
+    generalize (c * (e₂ : ℤ) - d * e₁) = t at h1 h2 ⊢
+    generalize (((a * e₁ + b * e₂ : ℕ) : ℤ)) = w at h1 h2 ⊢
+    rw [h1, h2, zpow_add₀ hx0, zpow_add₀ hy0]
+    ring
+  have hmul : ∀ r ∈ maximalIdeal R, ∀ g ∈ weightedMonomialIdeal ![x, y] ![a, b] M,
+      r * g ∈ weightedMonomialIdeal ![x, y] ![a, b] (M + 1) :=
+    fun r hr g hg => mul_mem_weightedMonomialIdeal_succ ha hb (hmax hr) hg
+  have hfM := hf
+  unfold weightedMonomialIdeal at hf
+  change f ∈ Submodule.span R _ at hf
+  induction hf using Submodule.span_induction with
+  | mem r hr =>
+    obtain ⟨β, hβ, rfl⟩ := hr
+    simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one] at hβ
+    by_cases heq : a * β 0 + b * β 1 = M
+    · refine ⟨(∏ i, ![x, y] i ^ β i), zf ^ (c * β 1 - d * β 0), hzpow _, ?_, by simp⟩
+      rw [Fin.prod_univ_two, map_mul, map_pow, map_pow]
+      simp only [Matrix.cons_val_zero, Matrix.cons_val_one]
+      rw [key, heq]
+    · refine ⟨0, 0, zero_mem _, by simp, ?_⟩
+      rw [sub_zero]
+      refine Ideal.subset_span ⟨β, ?_, rfl⟩
+      simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one]
+      omega
+  | zero => exact ⟨0, 0, zero_mem _, by simp, by simp⟩
+  | add f g hf' hg' ihf ihg =>
+    obtain ⟨G, L, hL, hG, hfG⟩ := ihf hf'
+    obtain ⟨G', L', hL', hG', hgG⟩ := ihg hg'
+    refine ⟨G + G', L + L', add_mem hL hL', by rw [map_add, hG, hG', add_mul], ?_⟩
+    rw [add_sub_add_comm]
+    exact add_mem hfG hgG
+  | smul r f hf' ih =>
+    obtain ⟨G, L, hL, hG, hfG⟩ := ih hf'
+    obtain ⟨r₀, hr₀⟩ := hres r
+    refine ⟨algebraMap k R r₀ * G, algebraMap k K r₀ * L,
+      mul_mem (Subalgebra.algebraMap_mem _ _) hL, ?_, ?_⟩
+    · rw [map_mul, hG, ← IsScalarTower.algebraMap_apply, mul_assoc]
+    · have he : r • f - algebraMap k R r₀ * G =
+          algebraMap k R r₀ * (f - G) + (r - algebraMap k R r₀) * f := by
+        rw [smul_eq_mul]; ring
+      rw [he]
+      exact add_mem (Ideal.mul_mem_left _ _ hfG) (hmul _ hr₀ f hf')
+
+/-- A nonzero element of `ℤᵐ⁰` which is at most one is `exp(-M)` for some `M : ℕ`. -/
+theorem exists_eq_exp_neg_natCast {t : ℤᵐ⁰} (h0 : t ≠ 0) (h1 : t ≤ 1) :
+    ∃ M : ℕ, t = WithZero.exp (-(M : ℤ)) := by
+  have hl : WithZero.log t ≤ 0 := by
+    rwa [← WithZero.exp_le_exp, WithZero.exp_log h0, WithZero.exp_zero]
+  refine ⟨(-WithZero.log t).toNat, ?_⟩
+  rw [Int.toNat_of_nonneg (by omega), neg_neg, WithZero.exp_log h0]
+
+/-- **The residue field of a monomial valuation.** Let `v` be a valuation of the fraction field
+`K` of a local `k`-algebra `R` with residue field `k` and maximal ideal `(x, y)`, monomial of
+coprime positive weights `(a, b)` in `x, y`. Then every `F ∈ K` with `v(F) = 1` is congruent,
+modulo the maximal ideal of `v`, to a quotient `L₁ / L₂` of Laurent polynomials in `y^a x^{-b}`
+with `v(L₂) = 1`. -/
+theorem exists_mem_adjoin_valuation_mul_sub_lt_one [IsLocalRing R] [IsFractionRing R K]
+    (v : Valuation K ℤᵐ⁰) (hvR : ∀ r : R, v (algebraMap R K r) ≤ 1) {x y : R} {a b : ℕ}
+    {c d : ℤ} (hcd : (a : ℤ) * c + b * d = 1) (ha : 0 < a) (hb : 0 < b)
+    (hvx : v (algebraMap R K x) = WithZero.exp (-(a : ℤ)))
+    (hvy : v (algebraMap R K y) = WithZero.exp (-(b : ℤ)))
+    (hres : ∀ r : R, ∃ r₀ : k, r - algebraMap k R r₀ ∈ maximalIdeal R)
+    (hmax : maximalIdeal R ≤ Ideal.span {x, y})
+    (hmon : ∀ f : R, f ≠ 0 → ∀ M : ℕ, v (algebraMap R K f) = WithZero.exp (-(M : ℤ)) →
+      f ∈ weightedMonomialIdeal ![x, y] ![a, b] M)
+    (F : K) (hF : v F = 1) :
+    ∃ L₁ ∈ Algebra.adjoin k
+        {algebraMap R K y ^ (a : ℤ) * algebraMap R K x ^ (-(b : ℤ)),
+          (algebraMap R K y ^ (a : ℤ) * algebraMap R K x ^ (-(b : ℤ)))⁻¹},
+      ∃ L₂ ∈ Algebra.adjoin k
+        {algebraMap R K y ^ (a : ℤ) * algebraMap R K x ^ (-(b : ℤ)),
+          (algebraMap R K y ^ (a : ℤ) * algebraMap R K x ^ (-(b : ℤ)))⁻¹},
+      v L₂ = 1 ∧ v (F * L₂ - L₁) < 1 := by
+  have hx0 : algebraMap R K x ≠ 0 := by
+    intro h; rw [h, map_zero] at hvx; exact WithZero.exp_ne_zero hvx.symm
+  have hy0 : algebraMap R K y ≠ 0 := by
+    intro h; rw [h, map_zero] at hvy; exact WithZero.exp_ne_zero hvy.symm
+  set u := algebraMap R K x ^ c * algebraMap R K y ^ d with hu
+  have hvu : v u = WithZero.exp (-1) := by
+    rw [hu, map_mul, map_zpow₀, map_zpow₀, hvx, hvy, ← WithZero.exp_zsmul, ← WithZero.exp_zsmul,
+      ← WithZero.exp_add]
+    congr 1
+    simp only [smul_eq_mul]
+    linear_combination -hcd
+  have hu0 : u ≠ 0 := by intro h; rw [h, map_zero] at hvu; exact WithZero.exp_ne_zero hvu.symm
+  obtain ⟨f, h, hh, rfl⟩ := IsFractionRing.div_surjective (A := R) F
+  have hh0 : algebraMap R K h ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hh
+  have hF0 : algebraMap R K f / algebraMap R K h ≠ 0 := by
+    intro h0; rw [h0, map_zero] at hF; exact zero_ne_one hF
+  have hf0 : algebraMap R K f ≠ 0 := by intro h0; apply hF0; rw [h0, zero_div]
+  have hvh0 : v (algebraMap R K h) ≠ 0 := (Valuation.ne_zero_iff _).mpr hh0
+  obtain ⟨M, hM⟩ := exists_eq_exp_neg_natCast hvh0 (hvR h)
+  have hvf : v (algebraMap R K f) = WithZero.exp (-(M : ℤ)) := by
+    have : algebraMap R K f = algebraMap R K f / algebraMap R K h * algebraMap R K h := by
+      rw [div_mul_cancel₀ _ hh0]
+    rw [this, map_mul, hF, one_mul, hM]
+  have hfR : f ≠ 0 := by rintro rfl; exact hf0 (map_zero _)
+  have hhR : h ≠ 0 := by rintro rfl; exact hh0 (map_zero _)
+  obtain ⟨Gf, Lf, hLf, hGf, hfG⟩ := exists_eq_mul_zpow_and_sub_mem_weightedMonomialIdeal hx0 hy0
+    hcd ha hb hres hmax M (hmon f hfR M hvf)
+  obtain ⟨Gh, Lh, hLh, hGh, hhG⟩ := exists_eq_mul_zpow_and_sub_mem_weightedMonomialIdeal hx0 hy0
+    hcd ha hb hres hmax M (hmon h hhR M hM)
+  have hbf := valuation_le_of_mem_weightedMonomialIdeal v hvR hvx hvy hfG
+  have hbh := valuation_le_of_mem_weightedMonomialIdeal v hvR hvx hvy hhG
+  rw [map_sub] at hbf hbh
+  have hlt : WithZero.exp (-((M + 1 : ℕ) : ℤ)) < WithZero.exp (-(M : ℤ)) := by
+    rw [WithZero.exp_lt_exp]; push_cast; omega
+  have hvGh : v (algebraMap R K Gh) = WithZero.exp (-(M : ℤ)) := by
+    have he : algebraMap R K Gh =
+        algebraMap R K h + -(algebraMap R K h - algebraMap R K Gh) := by ring
+    rw [he, v.map_add_eq_of_lt_left (by rw [Valuation.map_neg, hM]; exact hbh.trans_lt hlt), hM]
+  have hvGf : v (algebraMap R K Gf) ≤ WithZero.exp (-(M : ℤ)) := by
+    have he : algebraMap R K Gf =
+        algebraMap R K f - (algebraMap R K f - algebraMap R K Gf) := by ring
+    rw [he]
+    refine (v.map_sub _ _).trans (max_le hvf.le (hbf.trans hlt.le))
+  have hvuM : v (u ^ (M : ℤ)) = WithZero.exp (-(M : ℤ)) := by
+    rw [map_zpow₀, hvu, ← WithZero.exp_zsmul]; congr 1; simp
+  have hvLh : v Lh = 1 := by
+    have h1 := congrArg v hGh
+    rw [map_mul, hvGh, hvuM] at h1
+    have h2 : (1 : ℤᵐ⁰) * WithZero.exp (-(M : ℤ)) = v Lh * WithZero.exp (-(M : ℤ)) := by
+      rw [one_mul]; exact h1
+    exact (mul_right_cancel₀ (WithZero.exp_ne_zero) h2).symm
+  refine ⟨Lf, hLf, Lh, hLh, hvLh, ?_⟩
+  have huM0 : u ^ (M : ℤ) ≠ 0 := zpow_ne_zero _ hu0
+  have hLh' : Lh = algebraMap R K Gh / u ^ (M : ℤ) := by rw [hGh, mul_div_cancel_right₀ _ huM0]
+  have hLf' : Lf = algebraMap R K Gf / u ^ (M : ℤ) := by rw [hGf, mul_div_cancel_right₀ _ huM0]
+  set num := (algebraMap R K f - algebraMap R K Gf) * algebraMap R K Gh -
+    algebraMap R K Gf * (algebraMap R K h - algebraMap R K Gh) with hnum
+  set den := algebraMap R K h * u ^ (M : ℤ) with hden
+  have hden0 : den ≠ 0 := mul_ne_zero hh0 huM0
+  have hX : (algebraMap R K f / algebraMap R K h * Lh - Lf) * den = num := by
+    rw [hLh', hLf', hnum, hden]
+    field_simp
+    ring
+  have hvnum : v num ≤ WithZero.exp (-((M + 1 : ℕ) : ℤ)) * WithZero.exp (-(M : ℤ)) := by
+    refine (v.map_sub _ _).trans (max_le ?_ ?_)
+    · rw [map_mul, hvGh]; exact mul_le_mul' hbf le_rfl
+    · rw [map_mul, mul_comm]; exact mul_le_mul' hbh hvGf
+  have hvden : v den = WithZero.exp (-(M : ℤ)) * WithZero.exp (-(M : ℤ)) := by
+    rw [hden, map_mul, hM, hvuM]
+  by_contra hge
+  rw [not_lt] at hge
+  have h1 : 1 * v den ≤ v (algebraMap R K f / algebraMap R K h * Lh - Lf) * v den :=
+    mul_le_mul' hge le_rfl
+  rw [one_mul, ← map_mul, hX] at h1
+  have h2 := h1.trans hvnum
+  rw [hvden, ← WithZero.exp_add, ← WithZero.exp_add, WithZero.exp_le_exp] at h2
+  push_cast at h2
+  omega
+
+end WeightedMonomialResidue
+
+section PointResidue
+
+open exteriorPower
+
+variable {k : Type} [Field k]
+
+/-- The unit `m`-canonical form `1^{⊗m}` of degree zero on an integral scheme over `k`. -/
+noncomputable def pointUnitForm {T : Scheme.{0}} (sT : T ⟶ Spec (.of k)) [IsIntegral T]
+    (m : ℕ) : RationalPluriForms sT 0 m :=
+  letI := functionFieldAlgebra sT
+  (PiTensorProduct.tprod T.functionField fun _ : Fin m =>
+      exteriorPower.ιMulti T.functionField 0 fun i => i.elim0 :
+    TensorPower T.functionField m (⋀[T.functionField]^0 Ω[T.functionField⁄k]))
+
+/-- **Pull-back of the unit form.** Along a homomorphism of function fields of
+zero-dimensional varieties over a field of characteristic zero, `φ^* 1^{⊗m} = 1^{⊗m}`. -/
+theorem pluriformPullback_pointUnitForm [CharZero k] {T T' : Scheme.{0}}
+    {sT : T ⟶ Spec (.of k)} {sT' : T' ⟶ Spec (.of k)} [IsIntegral T] [IsIntegral T']
+    [LocallyOfFiniteType sT] [LocallyOfFiniteType sT'] (hT : topologicalKrullDim T = 0)
+    (hT' : topologicalKrullDim T' = 0) (φ : FunctionFieldHom sT sT') (m : ℕ) :
+    pluriformPullback sT sT' φ 0 m (pointUnitForm sT' m) = pointUnitForm sT m := by
+  let := functionFieldAlgebra sT'
+  let := functionFieldAlgebra sT
+  set ω : ⋀[T'.functionField]^0 Ω[T'.functionField⁄k] :=
+    exteriorPower.ιMulti T'.functionField 0 fun i => i.elim0 with hωdef
+  have hω0 : ω ≠ 0 := by
+    intro h
+    have := congrArg (exteriorPower.zeroEquiv T'.functionField _) h
+    simp [ω] at this
+  have hspan : Submodule.span T'.functionField {ω} = ⊤ := by
+    rw [← exteriorPower.ιMulti_span T'.functionField 0 Ω[T'.functionField⁄k]]
+    congr 1
+    ext x
+    simp only [Set.mem_singleton_iff, Set.mem_range]
+    constructor
+    · rintro rfl
+      exact ⟨_, rfl⟩
+    · rintro ⟨f, rfl⟩
+      congr 1
+      funext i
+      exact i.elim0
+  have hgen := isPullbackGenerator_functionFieldHom (sX := sT) (sX' := sT') (d := 0)
+    (by exact_mod_cast hT) (by exact_mod_cast hT') φ hspan hω0
+  have h := pluriformPullback_smul_formPow φ hgen m 1
+  rw [one_smul, map_one, one_smul] at h
+  change pluriformPullback sT sT' φ 0 m (formPow ω m) = _
+  rw [h]
+  let : Algebra T'.functionField T.functionField := φ.toRingHom.toAlgebra
+  unfold formPow pointUnitForm
+  congr 2
+  funext _
+  rw [hωdef, topFormsMap_ιMulti]
+  congr 1
+  funext i
+  exact i.elim0
+
+/-- Over an algebraically closed field, the function field of a zero-dimensional integral scheme
+of finite type is the base field. -/
+theorem bijective_algebraMap_functionField_of_topologicalKrullDim_eq_zero [IsAlgClosed k]
+    {T : Scheme.{0}} (sT : T ⟶ Spec (.of k)) [IsIntegral T] [LocallyOfFiniteType sT]
+    (hT : topologicalKrullDim T = 0) :
+    letI := functionFieldAlgebra sT
+    Function.Bijective (algebraMap k T.functionField) := by
+  letI := functionFieldAlgebra sT
+  have h := toENat_trdeg_functionField (sX := sT)
+  rw [hT] at h
+  have h0 : Algebra.trdeg k T.functionField = 0 := by
+    have : Cardinal.toENat (Algebra.trdeg k T.functionField) = 0 := by exact_mod_cast h
+    exact Cardinal.toENat_eq_zero.mp this
+  haveI : Algebra.IsAlgebraic k T.functionField := trdeg_eq_zero_iff.mp h0
+  exact IsAlgClosed.algebraMap_bijective_of_isIntegral
+
+/-- Two zero-dimensional integral schemes of finite type over an algebraically closed field have
+`k`-isomorphic function fields. -/
+theorem nonempty_functionFieldEquiv_of_topologicalKrullDim_eq_zero [IsAlgClosed k]
+    {T T' : Scheme.{0}} (sT : T ⟶ Spec (.of k)) (sT' : T' ⟶ Spec (.of k)) [IsIntegral T]
+    [IsIntegral T'] [LocallyOfFiniteType sT] [LocallyOfFiniteType sT']
+    (hT : topologicalKrullDim T = 0) (hT' : topologicalKrullDim T' = 0) :
+    Nonempty (FunctionFieldEquiv sT sT') := by
+  letI := functionFieldAlgebra sT
+  letI := functionFieldAlgebra sT'
+  exact ⟨(AlgEquiv.ofBijective (Algebra.ofId k T'.functionField)
+      (bijective_algebraMap_functionField_of_topologicalKrullDim_eq_zero sT' hT')).symm.trans
+    (AlgEquiv.ofBijective (Algebra.ofId k T.functionField)
+      (bijective_algebraMap_functionField_of_topologicalKrullDim_eq_zero sT hT))⟩
+
+/-- `(dw/w)^{⊗m}` is unchanged by `w ↦ w⁻¹` for even `m`. -/
+theorem formPow_ιMulti_dlog_inv {K : Type*} [Field K] [Algebra k K] {w : K} (hw : w ≠ 0)
+    {m : ℕ} (hm : Even m) :
+    formPow (ιMulti K 1 ![w⁻¹⁻¹ • KaehlerDifferential.D k K w⁻¹]) m =
+      formPow (ιMulti K 1 ![w⁻¹ • KaehlerDifferential.D k K w]) m := by
+  have hD : w⁻¹⁻¹ • KaehlerDifferential.D k K w⁻¹ =
+      (-1 : K) • (w⁻¹ • KaehlerDifferential.D k K w) := by
+    have := kaehlerD_zpow_mul_zpow (k := k) hw hw (-1) 0
+    simp only [zpow_neg, zpow_one, zpow_zero, mul_one, Int.cast_neg, Int.cast_one,
+      Int.cast_zero, zero_smul, add_zero, neg_smul, one_smul] at this
+    rw [this, inv_inv, smul_smul w w⁻¹, mul_inv_cancel₀ hw, one_smul, neg_one_smul]
+  rw [hD, ιMulti_one_smul, formPow_smul, hm.neg_one_pow, one_smul]
+
+/-- **The residue of `(dw/w)^{⊗m}` at a point.** At a point `q` of codimension one where `w`
+has order `±1`, the residue of `(dw/w)^{⊗m}` is `(±1)^m 1^{⊗m} = 1^{⊗m}` for even `m`. -/
+theorem isPoincareResidue_formPow_dlog_pointUnitForm {Y S : Scheme.{0}} (sY : Y ⟶ Spec (.of k))
+    [IsIntegral Y] [IsLocallyNoetherian Y] [IsNormal Y] [IsIntegral S] (j : S ⟶ Y)
+    (hcoh : Order.coheight (j (genericPoint S)) = 1) {m : ℕ} (hm : Even m)
+    {w : Y.functionField} (hw0 : w ≠ 0)
+    (hw : Y.ord w (j (genericPoint S)) = 1 ∨ Y.ord w (j (genericPoint S)) = -1) :
+    letI := functionFieldAlgebra sY
+    IsPoincareResidue sY j 0 m
+      (formPow (ιMulti Y.functionField 1 ![w⁻¹ • KaehlerDifferential.D k Y.functionField w]) m)
+      (pointUnitForm (j ≫ sY) m) := by
+  letI := functionFieldAlgebra sY
+  letI := functionFieldAlgebra (j ≫ sY)
+  -- reduce to order one
+  obtain ⟨w', hw'0, hw'1, hw'⟩ : ∃ w' : Y.functionField, w' ≠ 0 ∧
+      Y.ord w' (j (genericPoint S)) = 1 ∧
+      formPow (ιMulti Y.functionField 1 ![w⁻¹ • KaehlerDifferential.D k Y.functionField w]) m =
+        formPow (ιMulti Y.functionField 1 ![w'⁻¹ • KaehlerDifferential.D k Y.functionField w']) m
+      := by
+    rcases hw with h1 | h1
+    · exact ⟨w, hw0, h1, rfl⟩
+    · refine ⟨w⁻¹, inv_ne_zero hw0, ?_, (formPow_ιMulti_dlog_inv hw0 hm).symm⟩
+      have := MMP.Mori.ord_zpow (j (genericPoint S)) hw0 (-1)
+      rw [zpow_neg, zpow_one] at this
+      rw [this, h1]; norm_num
+  rw [hw']
+  obtain ⟨t, ht⟩ := (Scheme.mem_range_algebraMap_stalk_iff_zero_le_ord hcoh hw'0).mpr
+    (by rw [hw'1]; exact zero_le_one)
+  refine ⟨t, 1, Fin.elim0, by rw [ht]; exact hw'1, ?_, ?_⟩
+  · rw [map_one, one_smul, ht]
+    unfold formPow
+    congr 1
+    funext _
+    rw [ιMulti_one_smul]
+    refine congrArg (w'⁻¹ • ·) ?_
+    congr 1
+    ext i
+    fin_cases i
+    rfl
+  · rw [map_one, one_smul]
+    rfl
+
+end PointResidue
+
+section Multiply
+
+variable {k : Type} [Field k] {Y T : Scheme.{0}} (sY : Y ⟶ Spec (.of k)) [IsIntegral Y]
+  [IsLocallyNoetherian Y] [IsIntegral T] (j : T ⟶ Y)
+
+/-- Multiplying a form by a function regular along `T` multiplies its residue by the
+restriction of the function. -/
+theorem IsPoincareResidue.algebraMap_smul {n m : ℕ} {τ : RationalPluriForms sY (n + 1) m}
+    {ρ : RationalPluriForms (j ≫ sY) n m} (h : IsPoincareResidue sY j n m τ ρ)
+    (f : Y.presheaf.stalk (j (genericPoint T))) :
+    IsPoincareResidue sY j n m (algebraMap _ Y.functionField f • τ)
+      ((j.stalkMap (genericPoint T)).hom f • ρ) := by
+  obtain ⟨t, g, x, ht, hτ, hρ⟩ := h
+  refine ⟨t, f * g, x, ht, ?_, ?_⟩
+  · rw [hτ, map_mul, mul_smul]
+    rfl
+  · rw [hρ, map_mul, mul_smul]
+    rfl
+
+end Multiply
+
+section Pullback
+
+/-- **Residues of pulled-back sections, with the value pinned.** If `σ : k(X') ≅ k(Y)` carries
+`v_D` to `v_P` with `P = j(T)`, the residue of `σ^*ω` along `T` is `ρ`, and `g - a ∈ 𝔪` at the
+centre of `D`, then the residue of `σ^*(g ω)` along `T` is `a ρ`. -/
+theorem IsPoincareResidue.pluriformPullback_smul_of_sub_mem_maximalIdeal {k : Type} [Field k]
+    {Y X' T : Scheme.{0}} {sY : Y ⟶ Spec (.of k)} {sX' : X' ⟶ Spec (.of k)}
+    [IsIntegral Y] [IsLocallyNoetherian Y] [IsNormal Y] [IsIntegral X']
+    [IsIntegral T] {j : T ⟶ Y} (P : MMP.Mori.PrimeDivisor Y)
+    (hP : j (genericPoint T) = P.genericPoint)
+    (σ : FunctionFieldEquiv sY sX') (D : DivisorOver k sX')
+    (hDv : ∀ g, D.valuation g = P.divisorialValuation ((σ.toHom) g)) {d m : ℕ}
+    {ω : RationalPluriForms sX' (d + 1) m} {ρ : RationalPluriForms (j ≫ sY) d m}
+    (h : IsPoincareResidue sY j d m (pluriformPullback sY sX' σ.toHom (d + 1) m ω) ρ)
+    (g : X'.presheaf.stalk (D.f D.E.genericPoint)) (a : k)
+    (hga : letI := stalkAlgebra sX' (D.f D.E.genericPoint)
+      g - algebraMap k _ a ∈ IsLocalRing.maximalIdeal (X'.presheaf.stalk (D.f D.E.genericPoint))) :
+    IsPoincareResidue sY j d m
+      (pluriformPullback sY sX' σ.toHom (d + 1) m (algebraMap _ X'.functionField g • ω))
+      (a • ρ) := by
+  letI := stalkAlgebra sX' (D.f D.E.genericPoint)
+  letI := functionFieldAlgebra sX'
+  letI := functionFieldAlgebra sY
+  haveI := isScalarTower_stalk_functionField sX' (D.f D.E.genericPoint)
+  have ha : D.valuation (algebraMap _ X'.functionField g - algebraMap k _ a) < 1 := by
+    have := MMP.Positivity.DivisorOver.valuation_algebraMap_lt_one D _ rfl _ hga
+    rwa [map_sub, ← IsScalarTower.algebraMap_apply] at this
+  set f := algebraMap _ X'.functionField g
+  have hpb : pluriformPullback sY sX' σ.toHom (d + 1) m (f • ω) =
+      σ f • pluriformPullback sY sX' σ.toHom (d + 1) m ω := by
+    let : Algebra X'.functionField Y.functionField := σ.toHom.toRingHom.toAlgebra
+    have : IsScalarTower k X'.functionField Y.functionField :=
+      IsScalarTower.of_algebraMap_eq fun c => (σ.toHom.commutes c).symm
+    exact pullbackForms_smul (k := k) (K := X'.functionField) (K' := Y.functionField)
+      (d := d + 1) (m := m) f ω
+  rw [hpb]
+  have hcoh : Order.coheight (j (genericPoint T)) = 1 := hP ▸ P.coheight_genericPoint
+  refine h.smul_of_ord_sub_pos sY j hcoh _ a ?_
+  have hσa : σ f - algebraMap k Y.functionField a = σ (f - algebraMap k X'.functionField a) := by
+    rw [map_sub, AlgEquiv.commutes]
+  rw [hσa]
+  by_cases hz : σ (f - algebraMap k X'.functionField a) = 0
+  · exact Or.inl hz
+  refine Or.inr ?_
+  have hv := (hDv _).symm.trans_lt ha
+  change P.divisorialValuation (σ (f - algebraMap k X'.functionField a)) < 1 at hv
+  rw [P.divisorialValuation_eq_exp_neg_ord hz, ← hP] at hv
+  have : -Y.ord (σ (f - algebraMap k X'.functionField a)) (j (genericPoint T)) < 0 := by
+    rwa [← WithZero.exp_lt_exp, WithZero.exp_zero]
+  omega
+
+/-- Every element of the local ring at a closed point of a scheme of finite type over an
+algebraically closed field has a value in `k`. -/
+theorem exists_sub_mem_maximalIdeal_of_isClosed {k : Type} [Field k] [IsAlgClosed k]
+    {X : Scheme.{0}} (sX : X ⟶ Spec (.of k)) [IsIntegral X] [LocallyOfFiniteType sX] (p : X)
+    (hc : IsClosed ({p} : Set X)) (g : X.presheaf.stalk p) :
+    letI := stalkAlgebra sX p
+    ∃ a : k, g - algebraMap k _ a ∈ IsLocalRing.maximalIdeal (X.presheaf.stalk p) := by
+  letI := stalkAlgebra sX p
+  obtain ⟨a, ha⟩ := MMP.Mori.SurfaceAux.residue_surjective sX _ hc (Ideal.Quotient.mk _ g)
+  refine ⟨a, ?_⟩
+  rw [← Ideal.Quotient.eq, ← ha]
+  rfl
+
+end Pullback
+
+section TwoStep
+
+open exteriorPower
+
+/-- A closed immersion of an integral scheme onto the support of a prime divisor sends the generic
+point to the generic point of the divisor. -/
+theorem map_genericPoint_eq_of_range_eq {Y T : Scheme.{0}} [IsIntegral T] (j : T ⟶ Y)
+    [IsClosedImmersion j] (P : MMP.Mori.PrimeDivisor Y)
+    (hrange : Set.range j.base = (P.support : Set Y)) : j (genericPoint T) = P.genericPoint := by
+  have h1 : closure ({j (genericPoint T)} : Set Y) = Set.range j.base := by
+    apply le_antisymm
+    · rw [hrange]
+      exact (AlgebraicGeometry.PrimeDivisor.support_eq_closure P ▸
+        isClosed_closure).closure_subset_iff.mpr
+        (Set.singleton_subset_iff.mpr (hrange ▸ Set.mem_range_self _))
+    · rintro _ ⟨z, rfl⟩
+      have hz : genericPoint T ⤳ z := (genericPoint_spec T).specializes trivial
+      exact specializes_iff_mem_closure.mp (hz.map j.continuous)
+  have h2 : closure ({j (genericPoint T)} : Set Y) = closure {P.genericPoint} := by
+    rw [h1, hrange, AlgebraicGeometry.PrimeDivisor.support_eq_closure]
+  exact (inseparable_iff_closure_eq.mpr h2).eq
+
+/-- An element of the local ring at a point of codimension one with positive order lies in the
+maximal ideal. -/
+theorem mem_maximalIdeal_of_ord_pos {Y : Scheme.{0}} [IsIntegral Y] [IsLocallyNoetherian Y]
+    [IsNormal Y] {η : Y} (hcoh : Order.coheight η = 1) (b : Y.presheaf.stalk η)
+    (hb : 0 < Y.ord (algebraMap _ Y.functionField b) η) :
+    b ∈ IsLocalRing.maximalIdeal (Y.presheaf.stalk η) := by
+  rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
+  intro hu
+  obtain ⟨c, hc⟩ := hu.exists_right_inv
+  have hb0 : algebraMap _ Y.functionField b ≠ 0 := by
+    intro h; rw [h, Scheme.ord_zero] at hb; exact lt_irrefl _ hb
+  have hc0 : algebraMap _ Y.functionField c ≠ 0 := by
+    intro h
+    have := congrArg (algebraMap _ Y.functionField) hc
+    rw [map_mul, h, mul_zero, map_one] at this
+    exact zero_ne_one this
+  have h1 := Scheme.ord_mul (x := η) hb0 hc0
+  rw [← map_mul, hc, map_one] at h1
+  have h0 : Y.ord (1 : Y.functionField) η = 0 := by
+    have := ord_zpow η (one_ne_zero (α := Y.functionField)) (0 : ℤ)
+    simpa using this
+  have h2 : 0 ≤ Y.ord (algebraMap _ Y.functionField c) η :=
+    (Scheme.mem_range_algebraMap_stalk_iff_zero_le_ord hcoh hc0).mp ⟨c, rfl⟩
+  omega
+
+/-- **Iterated residue of `g (dx/x ∧ dy/y)^{⊗m}` at a crossing.** Let `ι₁ : S₁ ⟶ Y` be a closed
+immersion of a normal curve onto a prime divisor `Q` of the normal surface `Y`, `jp : S' ⟶ S₁`
+an adjunction step onto a point `p'` with image `p ∈ Q ∩ Q'`, and `x, y` a regular system of
+parameters of `𝒪_{Y,p}` with `Q = (x)`, `Q' = (y)` at `p`. For `g ∈ 𝒪_{Y,p}` with value `a ∈ k`
+at `p`, the residue of `g (dx/x ∧ dy/y)^{⊗m}` along `Q`, then at `p'`, is `a • 1^{⊗m}` for even
+`m`. -/
+theorem isPoincareResidue_smul_formPow_dlog_two_step {k : Type} [Field k] [CharZero k]
+    {Y S₁ S' : Scheme.{0}} {sY : Y ⟶ Spec (.of k)} [IsIntegral Y] [IsLocallyNoetherian Y]
+    [IsNormal Y] [IsIntegral S₁] [IsLocallyNoetherian S₁] [IsNormal S₁] [IsIntegral S']
+    {ι₁ : S₁ ⟶ Y} [IsClosedImmersion ι₁] [LocallyOfFiniteType (ι₁ ≫ sY)]
+    {jp : S' ⟶ S₁} {B₁ : QDivisor S₁} {Bp : QDivisor S'}
+    (hp : IsAdjunctionStep (ι₁ ≫ sY) B₁ jp Bp)
+    {Q Q' : MMP.Mori.PrimeDivisor Y} (hne : Q ≠ Q') (hQ : Set.range ι₁.base = (Q.support : Set Y))
+    {p : Y} (hpp : ι₁ (jp (genericPoint S')) = p) (hpQ' : p ∈ Q'.support)
+    {x y : Y.presheaf.stalk p} (hxy : MMP.Mori.IsRegularSystemOfParameters ![x, y])
+    (hx : IdealSheafData.stalk Q.idealSheaf p = Ideal.span {x})
+    (hy : IdealSheafData.stalk Q'.idealSheaf p = Ideal.span {y})
+    (g : Y.presheaf.stalk p) (a : k)
+    (hga : letI := stalkAlgebra sY p
+      g - algebraMap k _ a ∈ IsLocalRing.maximalIdeal (Y.presheaf.stalk p))
+    {m : ℕ} (hm : Even m) :
+    letI := functionFieldAlgebra sY
+    ∃ ρ₁ : RationalPluriForms (ι₁ ≫ sY) 1 m,
+      IsPoincareResidue sY ι₁ 1 m (algebraMap _ Y.functionField g •
+        (formPow (ιMulti Y.functionField 2
+          ![(algebraMap _ Y.functionField x)⁻¹ •
+              KaehlerDifferential.D k Y.functionField (algebraMap _ Y.functionField x),
+            (algebraMap _ Y.functionField y)⁻¹ •
+              KaehlerDifferential.D k Y.functionField (algebraMap _ Y.functionField y)]) m :
+          RationalPluriForms sY 2 m)) ρ₁ ∧
+      IsPoincareResidue (ι₁ ≫ sY) jp 0 m ρ₁ (a • pointUnitForm (jp ≫ ι₁ ≫ sY) m) := by
+  letI := functionFieldAlgebra sY
+  letI := functionFieldAlgebra (ι₁ ≫ sY)
+  haveI : PerfectField k := PerfectField.ofCharZero
+  subst hpp
+  have hpQ : ι₁ (jp (genericPoint S')) ∈ Q.support := by
+    have : ι₁ (jp (genericPoint S')) ∈ (Q.support : Set Y) := hQ ▸ ⟨_, rfl⟩
+    exact this
+  have hη : ι₁ (genericPoint S₁) = Q.genericPoint := map_genericPoint_eq_of_range_eq ι₁ Q hQ
+  have hcoh : Order.coheight (ι₁ (genericPoint S₁)) = 1 := hη ▸ Q.coheight_genericPoint
+  have hox := SNCWeight.LocalEquation.ord_localEq Q Q hpQ hpQ hx
+  have hoy := SNCWeight.LocalEquation.ord_localEq Q Q' hpQ hpQ' hy
+  rw [if_pos rfl] at hox
+  rw [if_neg hne] at hoy
+  have hx0 := SNCWeight.LocalEquation.localEq_ne_zero Q hpQ hx
+  have hy0 := SNCWeight.LocalEquation.localEq_ne_zero Q' hpQ' hy
+  obtain ⟨z, -, hzv, hres⟩ := isPoincareResidue_tprod_ιMulti_dlog sY ι₁ hcoh m hx0 hy0
+    (a := 1) (b := 0) (c := 1) (d := 0) (by rw [hη]; exact hox) (by rw [hη]; exact hoy)
+    (by norm_num)
+  simp only [zpow_one, neg_zero, zpow_zero, mul_one] at hzv
+  -- generization from `p` to the generic point of `Q`
+  have hTw : genericPoint S₁ ⤳ jp (genericPoint S') := (genericPoint_spec S₁).specializes trivial
+  have hζ : ι₁ (genericPoint S₁) ⤳ ι₁ (jp (genericPoint S')) := hTw.map ι₁.continuous
+  have hspalg : ∀ b, algebraMap _ Y.functionField ((Y.presheaf.stalkSpecializes hζ).hom b) =
+      algebraMap _ Y.functionField b :=
+    fun b => algebraMap_stalkSpecializes' Y hζ b
+  have key : ∀ b, (ι₁.stalkMap (genericPoint S₁)).hom ((Y.presheaf.stalkSpecializes hζ).hom b) =
+      algebraMap _ S₁.functionField ((ι₁.stalkMap (jp (genericPoint S'))).hom b) := fun b =>
+    Scheme.Hom.stalkSpecializes_stalkMap_apply ι₁ (genericPoint S₁) _ hTw b
+  have hzy : z = (Y.presheaf.stalkSpecializes hζ).hom y :=
+    IsFractionRing.injective _ Y.functionField (by rw [hzv, hspalg])
+  -- the first residue
+  have hres1 := hres.algebraMap_smul sY ι₁ ((Y.presheaf.stalkSpecializes hζ).hom g)
+  rw [hspalg] at hres1
+  refine ⟨(ι₁.stalkMap (genericPoint S₁)).hom ((Y.presheaf.stalkSpecializes hζ).hom g) •
+    (formPow (ιMulti S₁.functionField 1
+      ![((ι₁.stalkMap (genericPoint S₁)).hom z)⁻¹ • KaehlerDifferential.D k
+        S₁.functionField ((ι₁.stalkMap (genericPoint S₁)).hom z)]) m :
+      RationalPluriForms (ι₁ ≫ sY) 1 m), hres1, ?_⟩
+  -- the local ring of `S₁` at `p'`
+  obtain ⟨hdvr, -, -, -, hcoh', -⟩ := hp.stalk_facts
+  haveI := hdvr
+  have hsurj : Function.Surjective (ι₁.stalkMap (genericPoint S₁)).hom :=
+    ι₁.stalkMap_surjective (genericPoint S₁)
+  letI : Field (S₁.presheaf.stalk (genericPoint S₁)) := inferInstanceAs (Field S₁.functionField)
+  have hmax : RingHom.ker (ι₁.stalkMap (genericPoint S₁)).hom =
+      IsLocalRing.maximalIdeal (Y.presheaf.stalk (ι₁ (genericPoint S₁))) :=
+    IsLocalRing.eq_maximalIdeal (RingHom.ker_isMaximal_of_surjective _ hsurj)
+  have hx' : (ι₁.stalkMap (jp (genericPoint S'))).hom x = 0 := by
+    have hm : (Y.presheaf.stalkSpecializes hζ).hom x ∈
+        IsLocalRing.maximalIdeal (Y.presheaf.stalk (ι₁ (genericPoint S₁))) :=
+      mem_maximalIdeal_of_ord_pos hcoh _ (by rw [hspalg, hη, hox]; exact one_pos)
+    rw [← hmax, RingHom.mem_ker, key] at hm
+    exact (map_eq_zero_iff _ (IsFractionRing.injective _ _)).mp hm
+  have hmax' : IsLocalRing.maximalIdeal (S₁.presheaf.stalk (jp (genericPoint S'))) =
+      Ideal.span {(ι₁.stalkMap (jp (genericPoint S'))).hom y} := by
+    rw [← IsLocalRing.map_maximalIdeal_of_surjective (ι₁.stalkMap (jp (genericPoint S'))).hom
+      (ι₁.stalkMap_surjective _), ← hxy.1, Ideal.map_span]
+    have hr : (ι₁.stalkMap (jp (genericPoint S'))).hom '' Set.range ![x, y] =
+        insert 0 {(ι₁.stalkMap (jp (genericPoint S'))).hom y} := by
+      rw [← Set.range_comp]
+      ext t
+      simp only [Set.mem_range, Function.comp_apply, Fin.exists_fin_two, Matrix.cons_val_zero,
+        Matrix.cons_val_one, hx', Set.mem_insert_iff, Set.mem_singleton_iff]
+      exact or_congr eq_comm eq_comm
+    rw [hr]
+    exact Submodule.span_insert_zero
+  have hyb0 : (ι₁.stalkMap (jp (genericPoint S'))).hom y ≠ 0 := by
+    intro h0
+    rw [h0, Ideal.span_singleton_eq_bot.mpr rfl] at hmax'
+    exact IsDiscreteValuationRing.not_a_field _ hmax'
+  have hyb0' : algebraMap _ S₁.functionField ((ι₁.stalkMap (jp (genericPoint S'))).hom y) ≠ 0 :=
+    (map_ne_zero_iff _ (IsFractionRing.injective _ _)).mpr hyb0
+  have hirr : Irreducible ((ι₁.stalkMap (jp (genericPoint S'))).hom y) :=
+    (IsDiscreteValuationRing.irreducible_iff_uniformizer _).mpr hmax'
+  have hordy : S₁.ord (algebraMap _ S₁.functionField ((ι₁.stalkMap (jp (genericPoint S'))).hom y))
+      (jp (genericPoint S')) = 1 :=
+    (Scheme.ord_eq_iff hcoh' hyb0').mpr (Ring.ordFrac_irreducible hirr)
+  have hzb' : (ι₁.stalkMap (genericPoint S₁)).hom z =
+      algebraMap _ S₁.functionField ((ι₁.stalkMap (jp (genericPoint S'))).hom y) := by
+    rw [hzy, key]
+  -- the second residue
+  have hpt := isPoincareResidue_formPow_dlog_pointUnitForm (ι₁ ≫ sY) jp hcoh' hm
+    (w := (ι₁.stalkMap (genericPoint S₁)).hom z) (by rw [hzb']; exact hyb0')
+    (Or.inl (by rw [hzb']; exact hordy))
+  refine hpt.smul_of_ord_sub_pos (ι₁ ≫ sY) jp hcoh' _ a ?_
+  letI := stalkAlgebra (ι₁ ≫ sY) (jp (genericPoint S'))
+  letI := stalkAlgebra sY (ι₁ (jp (genericPoint S')))
+  haveI := isScalarTower_stalk_functionField (ι₁ ≫ sY) (jp (genericPoint S'))
+  have hka : (ι₁.stalkMap (jp (genericPoint S'))).hom (algebraMap k _ a) = algebraMap k _ a :=
+    MMP.Threefold.Resolution.stalkMap_algebraMap (sX := sY) ι₁ _ a
+  have hfa : (ι₁.stalkMap (genericPoint S₁)).hom ((Y.presheaf.stalkSpecializes hζ).hom g) -
+        algebraMap k S₁.functionField a =
+      algebraMap _ S₁.functionField
+        ((ι₁.stalkMap (jp (genericPoint S'))).hom (g - algebraMap k _ a)) := by
+    rw [key, map_sub (ι₁.stalkMap (jp (genericPoint S'))).hom, hka,
+      map_sub (algebraMap _ S₁.functionField), ← IsScalarTower.algebraMap_apply]
+  rw [hfa]
+  have hbm : (ι₁.stalkMap (jp (genericPoint S'))).hom (g - algebraMap k _ a) ∈
+      IsLocalRing.maximalIdeal (S₁.presheaf.stalk (jp (genericPoint S'))) := by
+    rw [← IsLocalRing.map_maximalIdeal_of_surjective (ι₁.stalkMap (jp (genericPoint S'))).hom
+      (ι₁.stalkMap_surjective _)]
+    exact Ideal.mem_map_of_mem _ hga
+  rw [hmax'] at hbm
+  obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.mp hbm
+  by_cases hb0 : algebraMap _ S₁.functionField
+      ((ι₁.stalkMap (jp (genericPoint S'))).hom (g - algebraMap k _ a)) = 0
+  · exact Or.inl hb0
+  refine Or.inr ?_
+  have hc0 : algebraMap _ S₁.functionField c ≠ 0 := by
+    intro h; apply hb0; rw [← hc, map_mul, h, zero_mul]
+  rw [← hc, map_mul, Scheme.ord_mul hc0 hyb0', hordy]
+  have := (Scheme.mem_range_algebraMap_stalk_iff_zero_le_ord hcoh' hc0).mp ⟨c, rfl⟩
+  omega
+
+end TwoStep
+
+section PointForms
+
+open exteriorPower
+
+/-- `c • 1^{⊗m}` does not depend on the structure morphism beyond equality. -/
+theorem pointUnitForm_smul_heq {k : Type} [Field k] {T : Scheme.{0}} [IsIntegral T]
+    {s s' : T ⟶ Spec (.of k)} (h : s = s') (c : k) (m : ℕ) :
+    HEq (c • pointUnitForm s m) (c • pointUnitForm s' m) := by
+  subst h; rfl
+
+/-- For even `m`, `(q ∧ p)^{⊗m} = (p ∧ q)^{⊗m}`. -/
+theorem formPow_ιMulti_two_swap {k : Type} [Field k] {K : Type*} [Field K] [Algebra k K]
+    (p q : Ω[K⁄k]) {m : ℕ} (hm : Even m) :
+    formPow (ιMulti K 2 ![q, p]) m = formPow (ιMulti K 2 ![p, q]) m := by
+  have h := ιMulti_two_smul_add_smul p q (0 : K) 1 1 0
+  simp only [zero_smul, one_smul, zero_add, add_zero, mul_zero, mul_one, zero_sub] at h
+  rw [h, formPow_smul, hm.neg_one_pow, one_smul]
+
+/-- **A generator of the function field of a curve has simple zeros.** If `w` generates the
+function field of a normal integral scheme over `k` (`k(C) = k(w)`) and vanishes along a prime
+divisor `Q`, then `ord_Q w = 1`. -/
+theorem eq_one_of_adjoin_eq_top_of_ord_pos {k : Type} [Field k] {C : Scheme.{0}}
+    (sC : C ⟶ Spec (.of k)) [IsIntegral C] [IsLocallyNoetherian C] [IsNormal C]
+    (Q : MMP.Mori.PrimeDivisor C) {w : C.functionField}
+    (hw : letI := functionFieldAlgebra sC; IntermediateField.adjoin k {w} = ⊤)
+    (hpos : 0 < C.ord w Q.genericPoint) : C.ord w Q.genericPoint = 1 := by
+  classical
+  letI := functionFieldAlgebra sC
+  letI := stalkAlgebra sC Q.genericPoint
+  haveI := isScalarTower_stalk_functionField sC Q.genericPoint
+  haveI := Q.isDiscreteValuationRing_localRing
+  have hw0 : w ≠ 0 := by rintro rfl; rw [Scheme.ord_zero] at hpos; exact lt_irrefl _ hpos
+  have hvw : Q.divisorialValuation w = WithZero.exp (-C.ord w Q.genericPoint) :=
+    Q.divisorialValuation_eq_exp_neg_ord hw0
+  have hvw1 : Q.divisorialValuation w < 1 := by
+    rw [hvw, ← WithZero.exp_zero, WithZero.exp_lt_exp]; omega
+  have hconst : ∀ c : k, c ≠ 0 → Q.divisorialValuation (algebraMap k C.functionField c) = 1 := by
+    intro c hc
+    have hu : IsUnit (algebraMap k (C.presheaf.stalk Q.genericPoint) c) :=
+      (IsUnit.mk0 c hc).map _
+    have h0 := Q.ord_algebraMap_of_isUnit hu
+    rw [← IsScalarTower.algebraMap_apply] at h0
+    rw [Q.divisorialValuation_eq_exp_neg_ord ((map_ne_zero _).mpr hc), h0, neg_zero,
+      WithZero.exp_zero]
+  have hle : ∀ f : Polynomial k, Q.divisorialValuation (Polynomial.aeval w f) ≤ 1 := by
+    intro f
+    induction f using Polynomial.induction_on with
+    | C a =>
+      rw [Polynomial.aeval_C]
+      by_cases ha : a = 0
+      · rw [ha, map_zero, map_zero]; exact zero_le'
+      · rw [hconst a ha]
+    | add p q hp hq => rw [map_add]; exact Q.divisorialValuation.map_add_le hp hq
+    | monomial n a h =>
+      rw [pow_succ, ← mul_assoc, map_mul, Polynomial.aeval_X, map_mul]
+      exact mul_le_one' h hvw1.le
+  have hunit : ∀ f : Polynomial k, f.coeff 0 ≠ 0 →
+      Q.divisorialValuation (Polynomial.aeval w f) = 1 := by
+    intro f hf
+    obtain ⟨g, hg⟩ := Polynomial.X_dvd_sub_C (p := f)
+    have hfe : Polynomial.aeval w f = algebraMap k _ (f.coeff 0) + w * Polynomial.aeval w g := by
+      have := congrArg (Polynomial.aeval w) hg
+      rw [map_sub, Polynomial.aeval_C, map_mul, Polynomial.aeval_X] at this
+      rw [← this]; ring
+    have hlt : Q.divisorialValuation (w * Polynomial.aeval w g) <
+        Q.divisorialValuation (algebraMap k _ (f.coeff 0)) := by
+      rw [hconst _ hf, map_mul]
+      calc Q.divisorialValuation w * Q.divisorialValuation (Polynomial.aeval w g)
+          ≤ Q.divisorialValuation w := mul_le_of_le_one_right' (hle g)
+        _ < 1 := hvw1
+    rw [hfe, Q.divisorialValuation.map_add_eq_of_lt_left hlt, hconst _ hf]
+  have hpoly : ∀ f : Polynomial k, Polynomial.aeval w f ≠ 0 →
+      ∃ r : ℕ, Q.divisorialValuation (Polynomial.aeval w f) = Q.divisorialValuation w ^ r := by
+    intro f hf
+    have hf0 : f ≠ 0 := by rintro rfl; rw [map_zero] at hf; exact hf rfl
+    obtain ⟨g, hfg, hdvd⟩ := Polynomial.exists_eq_pow_rootMultiplicity_mul_and_not_dvd f hf0 0
+    refine ⟨f.rootMultiplicity 0, ?_⟩
+    have hg0 : g.coeff 0 ≠ 0 := by
+      intro h0; apply hdvd
+      rw [map_zero, sub_zero]
+      exact Polynomial.X_dvd_iff.mpr h0
+    conv_lhs => rw [hfg]
+    rw [map_mul, map_pow, map_sub, Polynomial.aeval_X, Polynomial.aeval_C, map_zero,
+      sub_zero, map_mul, map_pow, hunit g hg0, mul_one]
+  obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible Q.localRing
+  have hvt := Q.divisorialValuation_algebraMap_of_irreducible hϖ
+  have ht : algebraMap Q.localRing C.functionField ϖ ∈ IntermediateField.adjoin k {w} := by
+    rw [hw]; exact IntermediateField.mem_top
+  rw [IntermediateField.mem_adjoin_simple_iff] at ht
+  obtain ⟨r, s, hrs⟩ := ht
+  have ht0 : algebraMap Q.localRing C.functionField ϖ ≠ 0 := by
+    intro h0; rw [h0, map_zero] at hvt; exact WithZero.exp_ne_zero hvt.symm
+  have hs0 : Polynomial.aeval w s ≠ 0 := by
+    intro h0; rw [h0, div_zero] at hrs; exact ht0 hrs
+  have hr0 : Polynomial.aeval w r ≠ 0 := by
+    intro h0; rw [h0, zero_div] at hrs; exact ht0 hrs
+  obtain ⟨i, hi⟩ := hpoly r hr0
+  obtain ⟨j, hj⟩ := hpoly s hs0
+  have hv := congrArg Q.divisorialValuation hrs
+  rw [map_div₀, hi, hj, hvt, hvw, ← WithZero.exp_nsmul, ← WithZero.exp_nsmul,
+    ← WithZero.exp_sub, WithZero.exp_inj] at hv
+  simp only [smul_neg, nsmul_eq_mul] at hv
+  have h1 : C.ord w Q.genericPoint * ((i : ℤ) - j) = 1 := by linarith
+  exact Int.eq_one_of_mul_eq_one_right hpos.le h1
+
+end PointForms
+
+end MMP.Fourfold

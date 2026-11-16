@@ -1,0 +1,107 @@
+module
+
+public import MMP.RingTheory.Ideal.HeightOfLiesOver
+public import MMP.AlgebraicGeometry.SpreadingOut.LocalEquations
+
+/-!
+# The points of a finite cover over the generic point of a prime divisor
+
+Let `f : Y ⟶ X` be a finite dominant morphism of locally Noetherian integral schemes, `X`
+normal. A point `y` of `Y` over the generic point of a prime divisor `E` of `X` has codimension
+one: on an affine open `W` of `X` around `E`, the prime of `y` in `Γ(Y, f⁻¹ W)` lies over the
+height-one prime of `E` in `Γ(X, W)`, an integrally closed domain over which `Γ(Y, f⁻¹ W)` is
+finite, and so has height one. If `Y` is normal too, the local ring at `y` is a discrete valuation
+ring.
+
+## Main results
+
+* `MMP.FourfoldProofs.FractionalLogComplexProof.coheight_eq_one_of_map_eq_genericPoint`.
+* `MMP.FourfoldProofs.FractionalLogComplexProof.isDiscreteValuationRing_stalk_of_map_eq_genericPoint`.
+* `MMP.FourfoldProofs.FractionalLogComplexProof.exists_isUnit_mul_pow_of_mem_maximalIdeal`.
+-/
+
+@[expose] public section
+
+open CategoryTheory AlgebraicGeometry Opposite TopologicalSpace Order
+
+namespace MMP.FourfoldProofs.FractionalLogComplexProof
+
+universe u
+
+/-- **Points over the generic point of a prime divisor have codimension one.** -/
+theorem coheight_eq_one_of_map_eq_genericPoint {X Y : Scheme.{u}} [IsIntegral X] [IsIntegral Y]
+    [IsLocallyNoetherian X] [IsLocallyNoetherian Y] [IsNormal X] (f : Y ⟶ X) [IsFinite f]
+    [IsDominant f] (E : MMP.Mori.PrimeDivisor X) {y : Y} (hy : f y = E.genericPoint) :
+    coheight y = 1 := by
+  obtain ⟨_, ⟨W, hW, rfl⟩, hηW, -⟩ :=
+    X.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ E.genericPoint) isOpen_univ
+  have hyV : y ∈ f ⁻¹ᵁ W := show f y ∈ W from hy ▸ hηW
+  have hV : IsAffineOpen (f ⁻¹ᵁ W) := hW.preimage f
+  have : Nonempty W := ⟨⟨_, hηW⟩⟩
+  have : Nonempty (f ⁻¹ᵁ W) := ⟨⟨y, hyV⟩⟩
+  have : IsDomain Γ(X, W) := IsIntegral.component_integral _
+  have : IsDomain Γ(Y, f ⁻¹ᵁ W) := IsIntegral.component_integral _
+  have : IsNoetherianRing Γ(X, W) := IsLocallyNoetherian.component_noetherian ⟨W, hW⟩
+  have : IsNoetherianRing Γ(Y, f ⁻¹ᵁ W) := IsLocallyNoetherian.component_noetherian ⟨_, hV⟩
+  have : IsIntegrallyClosed Γ(X, W) :=
+    (AlgebraicGeometry.isNormal_iff_forall_affineOpen_normal X).mp inferInstance ⟨W, hW⟩
+      inferInstance
+  let : Algebra Γ(X, W) Γ(Y, f ⁻¹ᵁ W) := (f.app W).hom.toAlgebra
+  have : Module.Finite Γ(X, W) Γ(Y, f ⁻¹ᵁ W) := f.finite_app W hW
+  have hcompat : ∀ a : Γ(X, W), AlgebraicGeometry.functionFieldMap f
+      (X.germToFunctionField W a) = Y.germToFunctionField (f ⁻¹ᵁ W) (f.app W a) := fun a => by
+    rw [Scheme.Hom.app_eq_appLE]
+    exact MMP.Spreading.functionFieldMap_germToFunctionField f W _ le_rfl a
+  have : FaithfulSMul Γ(X, W) Γ(Y, f ⁻¹ᵁ W) := by
+    refine (faithfulSMul_iff_algebraMap_injective _ _).2 fun a a' h =>
+      X.germToFunctionField_injective W ((AlgebraicGeometry.functionFieldMap f).injective ?_)
+    rw [hcompat a, hcompat a']
+    exact congrArg _ h
+  let xE : W := ⟨E.genericPoint, hηW⟩
+  let yV : f ⁻¹ᵁ W := ⟨y, hyV⟩
+  let 𝔭 := (hW.primeIdealOf xE).asIdeal
+  let Q := (hV.primeIdealOf yV).asIdeal
+  have hQ𝔭 : Q.comap (algebraMap Γ(X, W) Γ(Y, f ⁻¹ᵁ W)) = 𝔭 := by
+    have h := IsAffineOpen.comap_primeIdealOf_appLE (f := f) W hW (f ⁻¹ᵁ W) hV le_rfl hyV
+    rw [← Scheme.Hom.app_eq_appLE] at h
+    refine (congrArg PrimeSpectrum.asIdeal h).trans ?_
+    congr 3
+  have : Q.LiesOver 𝔭 := ⟨hQ𝔭.symm⟩
+  let : Algebra Γ(X, W) (X.presheaf.stalk E.genericPoint) :=
+    TopCat.Presheaf.algebra_section_stalk X.presheaf xE
+  have hlocE : IsLocalization.AtPrime (X.presheaf.stalk E.genericPoint) 𝔭 :=
+    hW.isLocalization_stalk xE
+  let : Algebra Γ(Y, f ⁻¹ᵁ W) (Y.presheaf.stalk y) :=
+    TopCat.Presheaf.algebra_section_stalk Y.presheaf yV
+  have hlocy : IsLocalization.AtPrime (Y.presheaf.stalk y) Q := hV.isLocalization_stalk yV
+  have h𝔭 : 𝔭.height = 1 := by
+    have h1 := IsLocalization.AtPrime.ringKrullDim_eq_height 𝔭 (X.presheaf.stalk E.genericPoint)
+    rw [ringKrullDim_stalk_eq_coheight, E.coheight_genericPoint] at h1
+    exact_mod_cast h1.symm
+  have h2 := IsLocalization.AtPrime.ringKrullDim_eq_height Q (Y.presheaf.stalk y)
+  rw [ringKrullDim_stalk_eq_coheight, (height_eq_of_liesOver 𝔭 Q).trans h𝔭] at h2
+  exact_mod_cast h2
+
+/-- **The local ring at a point over a prime divisor is a discrete valuation ring.** -/
+theorem isDiscreteValuationRing_stalk_of_map_eq_genericPoint {X Y : Scheme.{u}} [IsIntegral X]
+    [IsIntegral Y] [IsLocallyNoetherian X] [IsLocallyNoetherian Y] [IsNormal X] [IsNormal Y]
+    (f : Y ⟶ X) [IsFinite f] [IsDominant f] (E : MMP.Mori.PrimeDivisor X) {y : Y}
+    (hy : f y = E.genericPoint) : IsDiscreteValuationRing (Y.presheaf.stalk y) :=
+  Stacks.AlgebraicGeometry.UnitsNormalProper.isDiscreteValuationRing_stalk
+    (coheight_eq_one_of_map_eq_genericPoint f E hy)
+
+/-- For an injective local homomorphism `φ : A →+* R` into a discrete valuation ring whose
+maximal ideal is generated by `s`, a non-zero `t` in the maximal ideal of `A` maps to `u * s ^ e`
+with `u` a unit and `e ≠ 0`. -/
+theorem exists_isUnit_mul_pow_of_mem_maximalIdeal {A R : Type*} [CommRing A] [CommRing R]
+    [IsDomain R] [IsDiscreteValuationRing R] [IsLocalRing A] (φ : A →+* R) [IsLocalHom φ]
+    (hφ : Function.Injective φ) {s : R} (hs : IsLocalRing.maximalIdeal R = Ideal.span {s})
+    {t : A} (ht : t ∈ IsLocalRing.maximalIdeal A) (ht0 : t ≠ 0) :
+    ∃ u : R, IsUnit u ∧ ∃ e : ℕ, e ≠ 0 ∧ φ t = u * s ^ e := by
+  obtain ⟨e, u, hu⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible
+    ((map_ne_zero_iff φ hφ).2 ht0) ((IsDiscreteValuationRing.irreducible_iff_uniformizer s).2 hs)
+  refine ⟨u, u.isUnit, e, fun he => ?_, hu⟩
+  rw [he, pow_zero, mul_one] at hu
+  exact map_nonunit φ t ht (hu ▸ u.isUnit)
+
+end MMP.FourfoldProofs.FractionalLogComplexProof
