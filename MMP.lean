@@ -981,6 +981,7 @@ public import MMP.AlgebraicGeometry.MMP.Fourfold.Flip.FloorProgramInputs
 public import MMP.AlgebraicGeometry.MMP.Fourfold.Flip.KltFlip
 public import MMP.AlgebraicGeometry.MMP.Fourfold.Flip.StratumAvoidsFlip
 public import MMP.AlgebraicGeometry.MMP.Fourfold.Flip.StratumDiscrepancyMonotone
+public import MMP.AlgebraicGeometry.MMP.Fourfold.GeneralType.MaximalProgram
 public import MMP.AlgebraicGeometry.MMP.Fourfold.GenericValuation
 public import MMP.AlgebraicGeometry.MMP.Fourfold.GoodModelFixedParts
 public import MMP.AlgebraicGeometry.MMP.Fourfold.GraphDivisor

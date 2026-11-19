@@ -449,7 +449,7 @@ private theorem isRIntersectionNumber_of_degree {X W : Scheme.{0}} {sX : X ⟶ S
 
 /-- A dominant morphism of integral varieties over `k` does not raise dimension in the target:
 `dim B ≤ dim A`. -/
-private theorem topologicalKrullDim_le_of_isDominant {k : Type} [Field k] {A B : Scheme.{0}}
+theorem topologicalKrullDim_le_of_isDominant {k : Type} [Field k] {A B : Scheme.{0}}
     [IsIntegral A] [IsIntegral B] {sA : A ⟶ Spec (.of k)} {sB : B ⟶ Spec (.of k)}
     [LocallyOfFiniteType sA] [LocallyOfFiniteType sB] (g : A ⟶ B) [IsDominant g]
     (hg : g ≫ sB = sA) : topologicalKrullDim B ≤ topologicalKrullDim A := by

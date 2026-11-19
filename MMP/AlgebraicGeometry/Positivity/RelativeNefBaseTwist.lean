@@ -264,7 +264,7 @@ private theorem nonneg_of_mem_closedConeOfCurves (φ : NumericalCurveClasses sX 
 /-- **A linear form negative on a curve is negative on an extremal ray of `NE̅(X)`.** On a
 projective variety, a linear form on `N₁(X)` that is negative on the class of some proper curve
 is negative on every nonzero element of some extremal ray of the closed cone of curves. -/
-private theorem exists_isExtremalRay_neg (e : NumericalCurveClasses sX →ₗ[ℝ] ℝ)
+public theorem exists_isExtremalRay_neg (e : NumericalCurveClasses sX →ₗ[ℝ] ℝ)
     (he : ∃ T : ProperCurve sX, e (OneCycle.numericalClass sX (T.cycle ℝ)) < 0) :
     ∃ R : Set (NumericalCurveClasses sX),
       IsExtremalRay ℝ (closedConeOfCurves sX : Set (NumericalCurveClasses sX)) R ∧

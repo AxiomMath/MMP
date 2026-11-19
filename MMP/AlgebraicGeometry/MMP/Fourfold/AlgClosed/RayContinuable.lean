@@ -128,7 +128,7 @@ private theorem divisorOfForm_pullback_eq_flipTransform {k : Type u} [Field k] [
 
 /-- The strict transform `(f⁺)⁻¹_* f_* K` of a canonical divisor `K` of `X⁻` along a proper
 birational `f : X⁻ ⟶ Z` and a small `f⁺ : X⁺ ⟶ Z` is a canonical divisor of `X⁺`. -/
-private theorem isCanonicalDivisor_flipTransform {k : Type u} [Field k] [PerfectField k]
+theorem isCanonicalDivisor_flipTransform {k : Type u} [Field k] [PerfectField k]
     {Xm Xp Z : Scheme.{u}} [IsIntegral Xm] [IsLocallyNoetherian Xm] [IsNormal Xm]
     [IsIntegral Xp] [IsLocallyNoetherian Xp] [IsNormal Xp] [CompactSpace Xp]
     {sXm : Xm ⟶ Spec (.of k)} {sZ : Z ⟶ Spec (.of k)} {sXp : Xp ⟶ Spec (.of k)}

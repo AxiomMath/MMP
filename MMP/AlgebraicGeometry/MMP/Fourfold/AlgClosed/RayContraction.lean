@@ -1446,7 +1446,7 @@ private theorem exists_isContractedBy_iff_of_isContractionOfRay
     htp.baseChange _, key⟩
 
 /-- On a log canonical pair `K + B` is `ℚ`-Cartier, for every canonical divisor `K`. -/
-private theorem isQCartier_of_isLogCanonicalPair {k : Type u} [Field k] [CharZero k]
+theorem isQCartier_of_isLogCanonicalPair {k : Type u} [Field k] [CharZero k]
     {X : Scheme.{u}} [IsIntegral X] [CompactSpace X] [IsLocallyNoetherian X] [IsNormal X]
     {sX : X ⟶ Spec (.of k)} {K : Divisor X} {B : QDivisor X}
     (hlc : MMP.Intersection.IsLogCanonicalPair sX B) (hK : ∃ n : ℕ, K.IsCanonicalDivisor sX n) :
